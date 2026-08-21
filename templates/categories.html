@@ -10,7 +10,7 @@
         </header>
 
         <div class="categories-cloud">
-            <a th:each="cat : ${categories.items}"
+            <a th:each="cat : ${categories}"
                th:href="@{${cat.status.permalink}}"
                class="category-cloud-item"
                th:text="${cat.spec.displayName}">

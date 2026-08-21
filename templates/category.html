@@ -16,7 +16,7 @@
                     <div class="post-card__cover" th:if="${post.spec.cover}">
                         <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" loading="lazy">
                     </div>
-                    <div class="post-card__content" th:classappend="${!post.spec.cover} ? 'post-card__content--no-cover'">
+                    <div class="post-card__content" th:classappend="${post.spec.cover == null or post.spec.cover == ''} ? 'post-card__content--no-cover'">
                         <div class="post-card__tags" th:if="${not #lists.isEmpty(post.tags)}">
                             <span th:each="tag : ${post.tags}" class="post-card__tag"
                                   th:text="${tag.spec.displayName}">标签</span>
