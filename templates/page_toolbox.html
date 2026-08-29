@@ -84,18 +84,21 @@
         transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, border-color .3s ease, background .3s ease;
         overflow: hidden; min-width: 0;
     }
+    @media (hover: hover) {
     .tb-card:hover {
         transform: translateY(-3px);
         border-color: var(--color-border-secondary);
         background: color-mix(in srgb, var(--color-bg-secondary) 82%, var(--color-brand-rgb, 66 165 245) 6%);
         box-shadow: 0 12px 32px rgba(0,0,0,.08);
     }
-    .tb-card:active { transform: scale(.975); transition-duration: .1s; }
-    [data-theme="dark"] .tb-card { background: rgba(30,30,30,.72); border-color: rgba(255,255,255,.08); }
     [data-theme="dark"] .tb-card:hover {
         background: rgba(40,40,40,.82); border-color: var(--color-brand);
         box-shadow: 0 14px 36px rgba(0,0,0,.35);
     }
+}
+    .tb-card:active { transform: scale(.975); transition-duration: .1s; }
+    @media (hover: none) { .tb-card:active { transform: none; } }
+    [data-theme="dark"] .tb-card { background: rgba(30,30,30,.72); border-color: rgba(255,255,255,.08); }
 
     .tb-icon {
         width: 42px; height: 42px; border-radius: 23%; /* 连续圆角接近 squircle */
