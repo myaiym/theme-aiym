@@ -434,102 +434,60 @@
     <script th:src="@{/assets/js/main.js?v=1.0.4}" defer></script>
         <script>
         (function () {
-          /* 滚动位置记忆：
-             - 从「列表卡片 → 详情」返回 => 恢复原位置
-             - 点击 tabbar/导航跳转后返回 => 回到顶部(默认，覆盖 bfcache 恢复)
-             - bfcache 恢复(pageshow+persisted)时按离开类型处理 */
-          var NAV_SELECTOR = "[data-nav-link], [data-mobile-nav-link], .mobile-menu-link, header-logo, [data-search-open]";
-          function key(path) { var p = path || location.pathname || "/"; return "__aiym_scroll_" + p.replace(/[^a-z0-9\/_-]/gi, "_"); }
-          function modeKey(path) { var p = path || location.pathname || "/"; return "__aiym_leavemode_" + p.replace(/[^a-z0-9\/_-]/gi, "_"); }
-          function save() { try { sessionStorage.setItem(key(), String(window.scrollY || document.documentElement.scrollTop || 0)); } catch(e){} }
-          function clearScroll() { try { sessionStorage.removeItem(key()); } catch(e){} }
-          function setMode(mode) { try { sessionStorage.setItem(modeKey(), mode); } catch(e){} }
-          function getMode() { try { return sessionStorage.getItem(modeKey()); } catch(e){ return null; } }
-          function restoreY() {
-            try {
-              var y = parseFloat(sessionStorage.getItem(key()) || "0");
-              if (isNaN(y) || y <= 0) return;
-              var r = document.documentElement;
-              r.style.scrollBehavior = "auto";
-              window.scrollTo(0, y);
-              r.style.removeProperty("scroll-behavior");
-            } catch(e){}
-          }
-          function scrollTop() {
-            var r = document.documentElement;
-            r.style.scrollBehavior = "auto";
-            window.scrollTo(0, 0);
-            r.style.removeProperty("scroll-behavior");
-          }
-          /* 点击导航 tab => 标记离开模式=tab；点击卡片 => 标记=card */
-          window.__aiymSkipRestore = false;
-          window.__aiymClickNav = false;
-          document.addEventListener("click", function(e){
-            var a = e.target && e.target.closest ? e.target.closest("a") : null;
-            if (!a) return;
-            var isNav = a.matches(NAV_SELECTOR);
-            window.__aiymSkipRestore = isNav;
-            window.__aiymClickNav = isNav;
-          }, true);
-
-          window.addEventListener("pagehide", function(){
-            /* 离开时记录「离开模式」，供返回时判断 */
-            var mode = window.__aiymSkipRestore ? "tab" : "card";
-            setMode(mode);
-            if (mode === "tab") clearScroll();   /* tab 离开：清位置记录(回顶) */
-            else save();                         /* card 离开：保留位置 */
-          });
-
-          /* 返回/前进导航(back_forward)时的恢复逻辑 */
-          var _restored = false;
-          function maybeRestore() {
-            if (_restored) return;          /* 只恢复一次，避免多次 scrollTo 造成的闪烁 */
-            var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-            var type = navEntry && navEntry.type || "navigate";
-            if (type !== "back_forward") return;
-            var mode = getMode();
-            if (mode === "tab") { scrollTop(); }
-            else { restoreY(); }
-            _restored = true;
-          }
-
-          /* 原生 bfcache 优先：返回时浏览器不刷新、原地精确停住。
-                      只有 bfcache 不可用(页面被重新加载)时才 JS 兜底恢复位置。 */
-                   window.addEventListener("pageshow", function(ev){
-                     var mode = getMode();
-                     if (ev.persisted) {
-                       /* bfcache 命中：页面未重新加载，浏览器已精确恢复原位置 */
-                       if (mode === "tab") scrollTop();   /* 离开时点过 tab -> 回顶 */
-                       /* card -> 保持浏览器恢复的位置，绝不干预 */
-                       return;
-                     }
-                     /* bfcache 未命中：页面被重新渲染，按场景同步(回顶/兜底) */
-                     var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-                     var type = navEntry && navEntry.type || "navigate";
-                     if (type === "reload") { scrollTop(); return; }       /* 刷新回顶 */
-                     if (type !== "back_forward") return;                  /* 普通跳转不移 */
-                     if (mode === "tab") { scrollTop(); return; }
-                     /* card 返回但 bf 没提供原位 -> JS 兜底恢复原位置 */
-                     doRestoreWithRetry();
-                   });
-
-                   var _rDone = false;
-                   function doRestoreWithRetry(){
-                     if (_rDone) return;
-                     var y = parseFloat(sessionStorage.getItem(key()) || "0");
-                     if (isNaN(y) || y <= 0) { _rDone = true; return; }    /* 无记录，无需恢复 */
-                     var de = document.documentElement;
-                     var tries = 0;
-                     (function attempt(){
-                       de.setAttribute("data-restore", "1");              /* 禁入场动画防闪 */
-                       window.scrollTo(0, y);
-                       if (Math.abs(window.scrollY - y) < 4) { _rDone = true; de.removeAttribute("data-restore"); return; }
-                       de.removeAttribute("data-restore");
-                       if (tries++ > 10) return;                          /* 内容未就绪则稍后再试 */
-                       setTimeout(attempt, 180);
-                     })();
-                   }
-        })();
+                  /* 极简滚动行为：
+                     - 回退/前进(pageshow + bfcache 命中): 浏览器原生原地保留，不做任何干预(不刷新、不恢复滚动、不重排)
+                     - 手动刷新(reload): 回到顶部 */
+                  function scrollTop() {
+                    var r = document.documentElement;
+                    r.style.scrollBehavior = "auto";
+                    window.scrollTo(0, 0);
+                    r.style.removeProperty("scroll-behavior");
+                  }
+                  window.addEventListener("pageshow", function(ev){
+                    if (ev.persisted) return;   /* bfcache 命中：完全不干预 */
+                    var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+                    var type = navEntry && navEntry.type || "navigate";
+                    if (type === "reload") scrollTop();   /* 手动刷新 -> 回顶 */
+                  });
+                })();
+        /* ===== 图片「不阻塞交互」优化(全局) =====
+                    只补 HTML 未写的轻量属性，绝不调用 getBoundingClientRect(强制重排会卡主线程)。
+                    · decoding=async: 解码不卡主线程
+                    · fetchpriority=low: 懒加载图低优先拉取,不抢首屏/主交互
+                    · onerror: 失败自动隐藏破图, 占位容器保留, 不影响交互
+                    (loading=lazy 已在各模板 HTML 手动写好) */
+                (function(){
+                          function applyFor(img){
+                            if (!img || img.tagName!=="IMG" || img.getAttribute("data-img-opt")) return;
+                            img.setAttribute("data-img-opt","1");
+                            if (!img.getAttribute("decoding")) img.setAttribute("decoding","async");
+                            /* 文章正文/长内容里的图一律懒加载(滚到才拉)，详情页打开不一次并发 N 张 MinIO 图 */
+                            if (!img.getAttribute("loading") && img.closest && img.closest(".post-content,.article-content,.content")){
+                              img.setAttribute("loading","lazy");
+                              img.setAttribute("fetchpriority","low");
+                            }
+                            if (!img.getAttribute("fetchpriority") && (img.getAttribute("loading")||"").toLowerCase()==="lazy")
+                              img.setAttribute("fetchpriority","low");
+                            if (!img.hasAttribute("data-no-fallback") && !img.getAttribute("onerror"))
+                              img.setAttribute("onerror","this.classList.add('img-fallback');this.style.visibility='hidden';");
+                          }
+                  var scan=function(){ var img=document.images, i; for(i=0;i<img.length;i++) applyFor(img[i]); };
+                  if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",scan);
+                  else scan();
+                  /* 动态 JS 渲染的图补轻量属性 (无布局, 只写属性) */
+                  if (typeof MutationObserver!=="undefined"){
+                    new MutationObserver(function(ms){
+                      var i,k,ad,targ;
+                      for (i=0;i<ms.length;i++) for (k=0;k<ms[i].addedNodes.length;k++){
+                        ad=ms[i].addedNodes[k];
+                        if (ad&&ad.nodeType===1){
+                          if (ad.tagName==="IMG") applyFor(ad);
+                          else if (ad.querySelectorAll){ targ=ad.querySelectorAll("img"); var j; for(j=0;j<targ.length;j++) applyFor(targ[j]); }
+                        }
+                      }
+                    }).observe(document.documentElement,{childList:true,subtree:true});
+                  }
+                })();
         </script>
         <halo:footer />
     </body>

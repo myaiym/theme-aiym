@@ -296,8 +296,8 @@
         .hot-section { max-width: none !important; }
         .article-grid { grid-template-columns: 1fr; gap: 10px; max-width: none !important; }
         .article-card { margin-bottom: 8px; }
-        .article-card__cover { height: auto; }
-        .article-card__cover img { width: 100%; height: auto; object-fit: contain; }
+        .article-card__cover { aspect-ratio: 16/9; height: auto; overflow: hidden; background: var(--color-bg-tertiary); display: flex; align-items: center; justify-content: center; }
+        .article-card__cover img { width: 100%; height: 100%; object-fit: contain; }
         .article-card__cover--letter { height: 128px; }
         .article-card__cover--letter span { font-size: 34px; }
         .article-card__body { padding: 10px 12px 12px; }
