@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html th:replace="~{modules/layout :: html(head = ~{::head}, content = ~{::content})}"
+<html th:replace="~{layout :: html(head = ~{::head}, content = ~{::content})}"
       xmlns:th="http://www.thymeleaf.org"
       lang="zh-CN">
 
@@ -104,15 +104,132 @@ function toolStats(text){if(!text)return'';return text.split('\n').length+' 行 
 <th:block th:fragment="content">
     <!-- 不用 page-content，直接在 container 里渲染，和 toolbox 一样 -->
     <style>
-    .page-header { text-align: center; padding: 20px 0 18px; }
-    .page-title { font-size: 24px; font-weight: 700; color: var(--color-text-primary); margin: 0; }
+    .page-header {
+        text-align: center; padding: 30px 0 26px;
+        animation: ttUp .45s ease-out both;
+    }
+    .page-title {
+        font-size: 30px; font-weight: 700; letter-spacing: -0.02em;
+        color: var(--color-text-primary); margin: 0 0 10px;
+    }
+    [data-theme="dark"] .page-title { color: #f0ece6; }
+    .page-desc {
+        font-size: 14px; color: var(--color-text-muted);
+        margin: 0; letter-spacing: 0.5px; font-weight: 400;
+        max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.5;
+    }
+    @keyframes ttUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @media (prefers-reduced-motion: reduce) { .page-header { animation: none !important; } }
+    @media (max-width: 767px) {
+        .page-header { padding: 14px 0 12px; }
+        .page-title { font-size: 22px; }
+        .page-desc { font-size: 12px; }
+    }
     </style>
     <div style="max-width:1100px;margin:0 auto;padding:28px 0 72px;">
         <header class="page-header">
             <h1 class="page-title" th:text="${singlePage.spec.title}">工具标题</h1>
+            <p class="page-desc" th:if="${singlePage.spec.excerpt?.raw != null and singlePage.spec.excerpt?.raw != ''}"
+               th:text="${singlePage.spec.excerpt?.raw}">工具简介</p>
         </header>
         <div th:utext="${singlePage.content?.content}">
         </div>
+        <!-- ═══ Apple 风格覆盖层（统一作用于 .tool-*  /  .json-*  /  .qr-* 三类工具体系）═══ -->
+        <style>
+        /* ── 压制移动端矩形按压高亮:让高亮跟随按钮的圆角而非方形 ── */
+        * { -webkit-tap-highlight-color: transparent !important; }
+        button, a, input, textarea, select {
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-appearance: none !important;
+            -webkit-touch-callout: none;
+        }
+        button:active, a:active, .tool-btn:active, .tool-tab:active, .md-action:active,
+        .json-tool-btn:active, .qr-btn:active, .qr-tab:active, .tool-btn-primary:active,
+        .json-tool-btn:active, .qr-choice button:active {
+            -webkit-tap-highlight-color: transparent !important;
+            outline: none !important;
+        }
+        /* 工具外部容器 Apple 化 */
+        .tool-page, .json-tool, .qr-tool, .swagger-tool { font-family: -apple-system, BlinkMacSystemFont, "SF Pro SC", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif; letter-spacing: 0.01em; }
+
+        /* ── 卡片：圆角 18px + 柔和阴影 + 连续 hover ── */
+        .tool-card, .json-panel, .qr-card {
+            border-radius: 18px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,.04);
+            transition: box-shadow .3s ease, transform .3s cubic-bezier(.34,1.56,.64,1), border-color .3s;
+        }
+        .tool-card:hover, .json-panel:hover, .qr-card:hover {
+            box-shadow: 0 14px 40px rgba(0,0,0,.09) !important;
+            transform: translateY(-2px);
+        }
+        .tool-card-header, .json-panel-header, .qr-card-head { border-bottom: 1px solid var(--color-border-primary); }
+        .tool-card-title, .json-panel-title, .qr-card-title { font-size: 13px; font-weight: 700; letter-spacing: -0.01em; }
+
+        /* ── 分段条 / Tabs：玻璃分段控件(不改字号/字重,保留工具自身排版) ── */
+        .tool-tabs, .json-toolbar, .qr-tabs {
+            background: var(--color-bg-secondary);
+            border-radius: 14px !important;
+            border: 1px solid var(--color-border-primary);
+            backdrop-filter: saturate(160%) blur(12px); -webkit-backdrop-filter: saturate(160%) blur(12px);
+            padding: 6px;
+        }
+        /* 仅统一 tab 圆角;不触碰 font/color,尊重各工具自身设计 */
+        .tool-tab, .json-tool-btn, .qr-tab { border-radius: 10px !important; transition: background .22s cubic-bezier(.22,1,.36,1), color .22s; }
+        .tool-tab.active { box-shadow: 0 0 0 1px var(--color-brand-glow); }
+        .json-tool-btn.active, .json-tool-btn:hover { box-shadow: 0 1px 3px var(--color-brand-glow); }
+        .qr-tab.active { box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+
+        /* ── 输入区 / 结果区：内嵌玻璃编辑区 ── */
+        .tool-textarea, .tool-input, .json-input, .json-output, .qr-textarea {
+            border-radius: 12px !important;
+            transition: border-color .25s, box-shadow .25s;
+        }
+        .tool-textarea:focus, .tool-input:focus, .json-input:focus, .qr-textarea:focus {
+            border-color: var(--color-brand) !important;
+            box-shadow: 0 0 0 4px var(--color-brand-glow) !important;
+        }
+
+        /* ── 按钮：胶囊化 + 统一字重(工具正文 font-weight 在渲染时缺失,此处恢复一致) ── */
+        .tool-btn, .json-tool-btn, .qr-btn, .tool-chip, .tool-toggle-btn { border-radius: 12px !important; font-weight: 600; }
+        .qr-tab, .tool-tab, .qr-choice button { font-weight: 600; }
+        .md-action { border-radius: 12px !important; font-weight: 600; white-space: nowrap; }
+        .tool-btn-primary, .json-tool-btn, .qr-btn { box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+        .tool-btn-primary:active, .json-tool-btn:active, .qr-btn:active { transform: scale(.96); }
+
+        /* ── 交互聚焦：移除浏览器默认方形 outline,改用品牌蓝圆角柔光 ── */
+        .tool-btn, .tool-tab, .json-tool-btn, .qr-btn, .qr-tab, .qr-choice button,
+        .md-action, .tool-toggle-btn, .tool-chip {
+            outline: none !important;
+        }
+        .tool-btn:focus-visible, .tool-tab:focus-visible, .json-tool-btn:focus-visible,
+        .qr-btn:focus-visible, .qr-tab:focus-visible, .qr-choice button:focus-visible,
+        .md-action:focus-visible {
+            box-shadow: 0 0 0 4px var(--color-brand-glow) !important;
+        }
+
+        /* ── Toggle/chip 胶囊 ── */
+        .tool-chip, .tool-toggle-btn, .qr-choice { border-radius: 10px !important; }
+        .tool-toggle-btn.active, .qr-choice.active { box-shadow: 0 1px 3px var(--color-brand-glow); }
+
+        /* ── 无障碍：弱动效用户关闭弹性 ── */
+        @media (prefers-reduced-motion: reduce) {
+            .tool-card, .tool-btn, .tool-tab, .tool-input, .tool-textarea,
+            .json-panel, .json-tool-btn, .qr-card, .qr-tab, .qr-btn, .qr-textarea { transition: none !important; transform: none !important; }
+        }
+        /* 移动端：卡片全宽圆角略收；修正 qrcode/swagger 的负 margin 导致的左偏；放大 markdown 编辑框 */
+        @media (max-width: 767px) {
+            .tool-card, .json-panel, .qr-card { border-radius: 16px !important; }
+            /* 恢复负 margin 拉偏的全宽容器，内容回到正常内边距 */
+            .qr-tool, .swagger-tool { margin-left: 0 !important; margin-right: 0 !important; }
+            .qr-tool .qr-card, .swagger-tool .sw-card {
+                border-radius: 14px !important;
+                border-left: 1px solid var(--color-border-primary) !important;
+                border-right: 1px solid var(--color-border-primary) !important;
+            }
+            /* markdown 等源码编辑框：加高，避免移动端过矮 */
+            .tool-textarea, .md-editor, .tool-source { min-height: 340px !important; }
+        }
+        </style>
     </div>
 </th:block>
 

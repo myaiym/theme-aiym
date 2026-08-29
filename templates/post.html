@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html th:replace="~{modules/layout :: html(head = null, content = ~{::content})}"
+<html th:replace="~{layout :: html(head = null, content = ~{::content})}"
       xmlns:th="http://www.thymeleaf.org"
       lang="zh-CN">
 
@@ -149,6 +149,57 @@
     .resource-supplement p { font-size: 14px; color: var(--color-text-secondary); line-height: 1.8; margin: 8px 0; }
     .resource-supplement blockquote { margin: 12px 0; padding: 12px 16px; background: rgba(var(--color-brand-rgb), 0.08); border-left: 3px solid var(--color-brand); border-radius: 0 8px 8px 0; }
     .resource-supplement blockquote p { margin: 4px 0; font-size: 14px; color: var(--color-text-secondary); line-height: 1.8; }
+
+    /* ═══ Apple 化覆盖层（文章详情 / 资源详情共用规范） ═══ */
+    /* 主卡片：连续圆角 + 双层柔和阴影 + 弹簧入场 */
+    .post-main {
+        border-radius: 20px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.05);
+        animation: postIn .55s cubic-bezier(.22,1,.36,1) backwards;
+    }
+    @keyframes postIn {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 封面 / 资源大图圆角对齐 */
+    .post-cover, .resource-hero-full, .resource-hero-full__img, .post-cover__img { border-radius: 16px; }
+
+    /* 上下篇：弹簧 hover */
+    .post-nav__item {
+        border-radius: 18px;
+        transition: transform .32s cubic-bezier(.34,1.56,.64,1), box-shadow .32s cubic-bezier(.34,1.56,.64,1), border-color .28s;
+    }
+    @media (hover: hover) {
+        .post-nav__item:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,.07); border-color: var(--color-brand); }
+    }
+    .post-nav__item:active { transform: scale(.98); transition-duration: .1s; }
+
+    /* 资源下载区 */
+    .resource-download-info { border-radius: 20px; }
+    .resource-download-btn, .resource-download-disabled, .resource-copy-btn { border-radius: 14px; }
+    .resource-download-btn { box-shadow: 0 4px 14px rgba(var(--color-brand-rgb), .25); transition: transform .25s cubic-bezier(.34,1.56,.64,1), background .2s, box-shadow .25s; }
+    @media (hover: hover) { .resource-download-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(var(--color-brand-rgb), .35); } }
+    .resource-download-btn:active, .resource-copy-btn:active { transform: scale(.97); }
+
+    /* 移动端 TOC 悬浮钮 squircle */
+    .post-toc-fab { border-radius: 14px; transition: all .25s cubic-bezier(.22,1,.36,1); }
+
+    /* 分享按钮胶囊已是 pill，保持 */
+    .post-share-btn { border-radius: 999px; transition: all .2s cubic-bezier(.22,1,.36,1); }
+
+    /* 移动端方形按压高亮修复（中途可能被溢出/焦点干扰） */
+    .post-main, .post-nav__item, .post-toc-fab, .resource-download-btn, .resource-copy-btn, .post-share-btn, a, button {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    :focus { outline: none; }
+    .post-nav__item:focus-visible, .resource-download-btn:focus-visible, .resource-copy-btn:focus-visible, .post-toc-fab:focus-visible, .post-share-btn:focus-visible {
+        box-shadow: 0 0 0 4px var(--color-brand-glow); outline: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .post-main, .post-nav__item, .resource-download-btn, .resource-copy-btn, .resource-download-info { animation: none !important; transition: none !important; }
+        .post-nav__item:hover, .resource-download-btn:hover { transform: none !important; }
+    }
     </style>
 
     <div class="post-layout" id="post-layout" th:attr="data-resource-cat=${theme.config.content?.resourceCategory ?: ''}, data-post-categories=${post.categories != null and !#lists.isEmpty(post.categories) ? post.categories[0].metadata.name : ''}">

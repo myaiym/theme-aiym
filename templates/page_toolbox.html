@@ -1,143 +1,176 @@
 <!DOCTYPE html>
-<html th:replace="~{modules/layout :: html(head = null, content = ~{::content})}"
+<html th:replace="~{layout :: html(head = null, content = ~{::content})}"
       xmlns:th="http://www.thymeleaf.org"
       lang="zh-CN">
 
 <th:block th:fragment="content">
     <style>
-    /* ===== 工具箱 Toolbox ===== */
-    .tb { max-width: 1100px; margin: 0 auto; padding: 28px 0 72px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    /* ===== 工具箱 Toolbox · Apple-inspired ===== */
+    .tb { max-width: 1100px; margin: 0 auto; padding: 28px 0 72px; }
 
-    /* Header */
-    .tb-head { text-align: center; padding: 20px 0 18px; animation: tbUp .45s ease-out both; }
-    .tb-title { font-size: 24px; font-weight: 700; color: var(--color-text-primary); margin: 0 0 6px; }
+    .hero-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.4em; height: 1.4em;
+        margin-right: .12em; vertical-align: middle; line-height: 1; font-size: 1.02em; flex-shrink: 0;
+        filter: drop-shadow(0 1px 1px rgba(0,0,0,.05)); text-align: center; }
+    /* Header — 排版主导，克制留白 */
+    .tb-head { text-align: center; padding: 28px 0 26px; animation: tbUp .45s ease-out both; }
+    .tb-title {
+        font-size: var(--fs-page-title); font-weight: 700; letter-spacing: -0.02em;
+        color: var(--color-text-primary); margin: 0 0 8px;
+    }
     [data-theme="dark"] .tb-title { color: #f0ece6; }
-    .tb-desc { font-size: 13px; color: var(--color-text-muted); margin: 0; letter-spacing: 1px; }
+    .tb-desc {
+        font-size: var(--fs-card-desc); color: var(--color-text-muted); margin: 0;
+        letter-spacing: 0.5px; font-weight: 400;
+    }
 
     /* Toolbar: search + cats */
-    .tb-toolbar { animation: tbUp .45s ease-out .06s both; margin-bottom: 18px; }
-    .tb-search { position: relative; margin-bottom: 12px; }
+    .tb-toolbar { animation: tbUp .6s ease-out .06s backwards; margin-bottom: 22px;
+        position: sticky; top: 47px; z-index: 20; background: var(--color-bg-primary); }
+    .tb-search { position: relative; margin-bottom: 14px; max-width: 440px; margin-left: auto; margin-right: auto; }
     .tb-search input {
-        width: 100%; padding: 11px 40px 11px 16px; font-size: 14px;
-        background: var(--color-bg-secondary); border: 1.5px solid var(--color-border-primary);
-        border-radius: var(--radius-md); color: var(--color-text-primary);
-        outline: none; transition: border-color .2s, box-shadow .2s;
+        width: 100%; padding: 13px 44px 13px 18px; font-size: 15px;
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: 999px; color: var(--color-text-primary);
+        outline: none; transition: border-color .25s, box-shadow .25s, background .25s;
         box-sizing: border-box; font-family: inherit;
+        box-shadow: 0 1px 2px rgba(0,0,0,.03);
     }
     .tb-search input::placeholder { color: var(--color-text-muted); }
-    .tb-search input:focus { border-color: var(--color-brand); box-shadow: 0 0 0 3px var(--color-brand-glow); }
+    .tb-search input:focus {
+        border-color: var(--color-brand); background: var(--color-bg-secondary);
+        box-shadow: 0 0 0 4px var(--color-brand-glow);
+    }
     .tb-search__icon {
-        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+        position: absolute; right: 17px; top: 50%; transform: translateY(-50%);
         color: var(--color-text-muted); pointer-events: none; font-size: 16px;
     }
 
-    .tb-cats { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tb-cats { display: flex; flex-wrap: nowrap; gap: 22px; justify-content: flex-start; overflow-x: auto;
+        scrollbar-width: none; padding: 0 2px; margin-bottom: 14px;
+        scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+    .tb-cats::-webkit-scrollbar { display: none; }
     .tb-cat {
-        padding: 8px 18px; font-size: 14px; font-weight: 500;
-        background: var(--color-bg-secondary); color: var(--color-text-secondary);
-        border: 1px solid var(--color-border-primary); border-radius: 10px;
-        cursor: pointer; transition: all .2s; font-family: inherit; white-space: nowrap;
+        flex: 0 0 auto; position: relative; padding: 10px 2px; font-size: var(--fs-filter); font-weight: 500; letter-spacing: 0.01em;
+        background: transparent; color: var(--color-text-secondary); border: none;
+        cursor: pointer; transition: color .25s cubic-bezier(.22,1,.36,1); font-family: inherit; white-space: nowrap;
+        -webkit-tap-highlight-color: transparent; scroll-snap-align: start;
     }
-    .tb-cat:hover { border-color: var(--color-brand); color: var(--color-brand); }
-    .tb-cat.active {
-        background: var(--color-brand); color: #fff; border-color: var(--color-brand);
-        box-shadow: 0 2px 8px var(--color-brand-glow);
-    }
+    .tb-cat::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: 0; height: 3px;
+        border-radius: 2px; background: var(--color-brand); transform: scaleX(0); transform-origin: center;
+        transition: transform .28s cubic-bezier(.22,1,.36,1); }
+    .tb-cat:hover { color: var(--color-text-primary); }
+    .tb-cat.active { color: var(--color-brand); font-weight: 600; }
+    .tb-cat.active::after { transform: scaleX(1); }
 
     /* Grid */
     .tb-grid {
-        display: grid; gap: 12px;
+        display: grid; gap: 14px;
         grid-template-columns: repeat(2, 1fr);
         max-width: 600px; margin: 0 auto;
     }
-    @media (min-width: 768px) { .tb-grid { grid-template-columns: repeat(3, 1fr); max-width: 780px; } }
+    @media (min-width: 768px) { .tb-grid { grid-template-columns: repeat(3, 1fr); max-width: 780px; gap: 16px; } }
     @media (min-width: 1024px) { .tb-grid { grid-template-columns: repeat(4, 1fr); max-width: 960px; } }
     @media (min-width: 1280px) { .tb-grid { grid-template-columns: repeat(5, 1fr); max-width: 1100px; } }
 
-    /* Card */
+    /* Card — 轻量玻璃质感，连续圆角，无硬描边 */
     .tb-card {
-        display: flex; align-items: center; gap: 10px;
-        padding: 10px 12px; background: var(--color-bg-secondary);
-        border: 1px solid var(--color-border-primary); border-radius: 12px;
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 15px;
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border-primary);
+        border-radius: 18px;
         cursor: pointer; text-decoration: none; color: inherit;
-        transition: transform .2s, box-shadow .2s, border-color .2s;
-        animation: tbUp .4s ease-out both;
+        transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, border-color .3s ease, background .3s ease;
+        animation: tbUp .5s cubic-bezier(.22,1,.36,1) both;
         overflow: hidden; min-width: 0;
     }
     .tb-card:hover {
-        transform: translateY(-2px); border-color: var(--color-brand);
-        box-shadow: 0 4px 12px rgba(0,0,0,.06);
+        transform: translateY(-3px);
+        border-color: var(--color-border-secondary);
+        background: color-mix(in srgb, var(--color-bg-secondary) 82%, var(--color-brand-rgb, 66 165 245) 6%);
+        box-shadow: 0 12px 32px rgba(0,0,0,.08);
     }
-    .tb-card:active { transform: scale(.97); }
-    [data-theme="dark"] .tb-card { background: #1e1e1e; border-color: #2a2a2a; }
-    [data-theme="dark"] .tb-card:hover { border-color: var(--color-brand); box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+    .tb-card:active { transform: scale(.975); transition-duration: .1s; }
+    [data-theme="dark"] .tb-card { background: rgba(30,30,30,.72); border-color: rgba(255,255,255,.08); }
+    [data-theme="dark"] .tb-card:hover {
+        background: rgba(40,40,40,.82); border-color: var(--color-brand);
+        box-shadow: 0 14px 36px rgba(0,0,0,.35);
+    }
 
     .tb-icon {
-        width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+        width: 42px; height: 42px; border-radius: 23%; /* 连续圆角接近 squircle */
+        flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
-        transition: transform .25s;
+        transition: transform .3s cubic-bezier(.34,1.56,.64,1);
     }
-    .tb-card:hover .tb-icon { transform: scale(1.05); }
+    .tb-card:hover .tb-icon { transform: scale(1.06); }
 
     .tb-info { flex: 1; min-width: 0; overflow: hidden; }
     .tb-name {
-        font-size: 14px; font-weight: 600; color: var(--color-text-primary);
+        font-size: var(--fs-card-title); font-weight: 600; letter-spacing: -0.01em; color: var(--color-text-primary);
         display: flex; align-items: center; gap: 6px;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     [data-theme="dark"] .tb-name { color: #f0ece6; }
     .tb-desc {
         font-size: 12px; color: var(--color-text-muted);
-        margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    /* Badge */
+    /* Badge — 柔和胶囊 */
     .tb-badge {
-        font-size: 10px; font-weight: 600; padding: 1px 6px;
+        font-size: 10px; font-weight: 600; padding: 2px 8px;
         background: var(--color-brand-light); color: var(--color-brand);
-        border-radius: 10px; flex-shrink: 0; line-height: 1.4;
+        border-radius: 999px; flex-shrink: 0; line-height: 1.4;
     }
 
     /* Count */
     .tb-count {
-        font-size: 12px; color: var(--color-text-muted); margin-top: 16px; text-align: center;
-        animation: tbUp .4s ease-out .2s both;
+        font-size: 12px; color: var(--color-text-muted); margin-top: 20px; text-align: center;
+        animation: tbUp .5s ease-out .2s both;
     }
 
     /* Empty */
-    .tb-empty { text-align: center; padding: 48px 0; animation: tbUp .4s ease-out both; }
-    .tb-empty__icon { font-size: 40px; margin-bottom: 10px; opacity: .6; }
+    .tb-empty { text-align: center; padding: 56px 0; animation: tbUp .5s ease-out both; }
+    .tb-empty__icon { font-size: 44px; margin-bottom: 12px; opacity: .5; }
     .tb-empty__text { font-size: 14px; color: var(--color-text-muted); }
 
-    @keyframes tbUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes tbUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* 无障碍：尊重减少动效偏好 */
+    @media (prefers-reduced-motion: reduce) {
+        .tb-head, .tb-toolbar, .tb-card, .tb-count, .tb-empty { animation: none !important; }
+        .tb-card, .tb-card:hover, .tb-card:active, .tb-icon { transition: none !important; transform: none !important; }
+    }
 
     @media (max-width: 767px) {
         .tb { padding: 12px 0 80px; }
-        .tb-head { padding: 12px 0 10px; }
-        .tb-title { font-size: 18px; }
-        .tb-desc { font-size: 11px; }
-        .tb-toolbar { margin-bottom: 10px; }
-        .tb-search { margin-bottom: 8px; }
-        .tb-search input { padding: 10px 36px 10px 12px; font-size: 13px; }
-        .tb-cats { gap: 6px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .tb-head { padding: 14px 0 12px; }
+        .tb-title { font-size: var(--fs-page-title); }
+        .tb-desc { font-size: var(--fs-card-desc); }
+        .tb-toolbar { margin-bottom: 12px; }
+        .tb-search { margin-bottom: 10px; max-width: 100%; }
+        .tb-search input { padding: 11px 40px 11px 16px; font-size: 13px; }
+        .tb-cats { gap: 22px; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding: 0 2px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .tb-cats::-webkit-scrollbar { display: none; }
-        .tb-cat { padding: 6px 14px; font-size: 13px; flex-shrink: 0; }
-        .tb-grid { gap: 8px; padding: 0; max-width: 100%; }
-        .tb-card { padding: 10px; gap: 8px; border-radius: 10px; }
-        .tb-card:hover { transform: none; box-shadow: var(--shadow-sm); }
+        .tb-cat { padding: 9px 2px; font-size: var(--fs-filter); flex-shrink: 0; }
+        .tb-grid { gap: 10px; padding: 0; max-width: 100%; }
+        .tb-card { padding: 12px; gap: 10px; border-radius: 16px; }
+        .tb-card:hover { transform: none; border-color: var(--color-border-secondary); background: var(--color-bg-secondary); }
         .tb-card:active { transform: scale(.97); }
-        .tb-icon { width: 36px; height: 36px; border-radius: 8px; }
-        .tb-icon span { font-size: 18px !important; }
+        .tb-icon { width: 40px; height: 40px; }
+        .tb-icon span { font-size: 19px !important; }
         .tb-name { font-size: 14px; }
         .tb-desc { font-size: 12px; margin-top: 2px; }
-        .tb-badge { font-size: 9px; padding: 1px 4px; }
-        .tb-count { font-size: 11px; margin-top: 10px; }
+        .tb-badge { font-size: 9px; padding: 1px 6px; }
+        .tb-count { font-size: 11px; margin-top: 12px; }
     }
     </style>
 
     <div class="tb page-content">
         <div class="tb-head">
-            <h1 class="tb-title">🧰 工具箱</h1>
+            <h1 class="tb-title"><span class="hero-icon">🧰</span>工具箱</h1>
             <p class="tb-desc">开发利器，随用随走</p>
         </div>
 
@@ -160,7 +193,7 @@
     <script th:inline="javascript">
     /*<![CDATA[*/
     (function() {
-        var brandColor = '#9b7ed8';
+        var brandColor = '#42A5F5';
         var root = document.documentElement;
         root.style.setProperty('--tb-brand', brandColor);
 

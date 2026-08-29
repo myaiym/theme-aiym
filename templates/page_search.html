@@ -1,9 +1,70 @@
 <!DOCTYPE html>
-<html th:replace="~{modules/layout :: html(head = null, content = ~{::content})}"
+<html th:replace="~{layout :: html(head = null, content = ~{::content})}"
       xmlns:th="http://www.thymeleaf.org"
       lang="zh-CN">
 
 <th:block th:fragment="content">
+    <style>
+    /* ═══ Apple 化覆盖层（搜索页）═══ */
+    .search-page { animation: searchIn .5s cubic-bezier(.22,1,.36,1) backwards; }
+    @keyframes searchIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 搜索框：更大圆角 + 柔和阴影 + 聚焦品牌光 */
+    .search-input-wrap {
+        border-radius: 16px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+        transition: box-shadow .3s cubic-bezier(.22,1,.36,1), border-color .3s;
+    }
+    .search-input-wrap:focus-within { border-color: var(--color-brand); box-shadow: 0 0 0 4px var(--color-brand-glow), 0 6px 18px rgba(0,0,0,.05); }
+    .search-submit { border-radius: 12px; }
+    .search-clear { border-radius: 50%; }
+
+    /* 结果列表：入场 stagger + 弹簧 hover */
+    .search-result-item {
+        border-radius: 16px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+        animation: searchIn .5s cubic-bezier(.22,1,.36,1) backwards;
+        transition: transform .32s cubic-bezier(.34,1.56,.64,1), box-shadow .32s cubic-bezier(.34,1.56,.64,1), border-color .28s;
+        border: 1px solid var(--color-border-secondary);
+    }
+    .search-results__list .search-result-item:nth-child(2) { animation-delay: .05s; }
+    .search-results__list .search-result-item:nth-child(3) { animation-delay: .1s; }
+    .search-results__list .search-result-item:nth-child(4) { animation-delay: .15s; }
+    .search-results__list .search-result-item:nth-child(5) { animation-delay: .2s; }
+    @media (hover: hover) { .search-result-item:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 14px 38px rgba(0,0,0,.09); border-color: var(--color-brand); } }
+    .search-result-item:active { transform: scale(.98); transition-duration: .1s; }
+
+    /* 热门搜索标签：pill 胶囊 + 玻璃 */
+    .search-hot__tags { gap: 8px; }
+    .search-hot__tag {
+        border-radius: 999px;
+        padding: 7px 16px;
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border-primary);
+        color: var(--color-text-secondary);
+        font-size: 13px;
+        cursor: pointer;
+        transition: all .25s cubic-bezier(.22,1,.36,1);
+        -webkit-backdrop-filter: saturate(160%) blur(10px); backdrop-filter: saturate(160%) blur(10px);
+    }
+    .search-hot__tag:hover { border-color: var(--color-brand); color: var(--color-brand); background: rgba(var(--color-brand-rgb), .06); }
+    .search-hot__tag:active { transform: scale(.95); }
+    .search-hot__title { font-size: 16px; }
+
+    /* 移动端方形按压高亮修复 + 焦点环 */
+    .search-input-wrap, .search-submit, .search-clear, .search-result-item, .search-hot__tag, a, button {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+    .search-result-item:focus-visible, .search-submit:focus-visible, .search-clear:focus-visible, .search-hot__tag:focus-visible { box-shadow: 0 0 0 4px var(--color-brand-glow); outline: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .search-page, .search-result-item { animation: none !important; transition: none !important; }
+        .search-result-item:hover { transform: none !important; }
+    }
+    </style>
+
     <div class="search-page">
         <!-- 搜索框 -->
         <div class="search-bar">
