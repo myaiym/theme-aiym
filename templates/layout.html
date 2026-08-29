@@ -434,22 +434,41 @@
     <script th:src="@{/assets/js/main.js?v=1.0.4}" defer></script>
         <script>
         (function () {
-                  /* 极简滚动行为：
-                     - 回退/前进(pageshow + bfcache 命中): 浏览器原生原地保留，不做任何干预(不刷新、不恢复滚动、不重排)
-                     - 手动刷新(reload): 回到顶部 */
-                  function scrollTop() {
-                    var r = document.documentElement;
-                    r.style.scrollBehavior = "auto";
-                    window.scrollTo(0, 0);
-                    r.style.removeProperty("scroll-behavior");
-                  }
-                  window.addEventListener("pageshow", function(ev){
-                    if (ev.persisted) return;   /* bfcache 命中：完全不干预 */
-                    var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-                    var type = navEntry && navEntry.type || "navigate";
-                    if (type === "reload") scrollTop();   /* 手动刷新 -> 回顶 */
-                  });
-                })();
+          /* 返回不刷新、保持原样：
+             优先原生 bfcache(命中则不干预，页面原样原位)。
+             若 bfcache 未命中(如首页图未加载完等)，页面会被重载 ->
+             用 sessionStorage 记住离开时的滚动位置，返回时轻量恢复，
+             让"进详情前在哪，返回后还在哪"。只滚动一次，不做轮询防卡。 */
+          function key() { var p = location.pathname || "/"; return "__aiym_scroll_" + p.replace(/[^a-z0-9\/_-]/gi, "_"); }
+          window.addEventListener("pagehide", function() {
+            try { sessionStorage.setItem(key(), String(window.scrollY || document.documentElement.scrollTop || 0)); } catch(e){}
+          });
+          function scrollTop() {
+            var r = document.documentElement;
+            r.style.scrollBehavior = "auto";
+            window.scrollTo(0, 0);
+            r.style.removeProperty("scroll-behavior");
+          }
+          window.addEventListener("pageshow", function(ev){
+            if (ev.persisted) {   /* bfcache 命中：页面原样，不动(不重新滚动) */
+              return;
+            }
+            var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+            var type = navEntry && navEntry.type || "navigate";
+            if (type === "reload") { scrollTop(); return; }   /* 手动刷新 -> 回顶 */
+            if (type === "back_forward") {
+              /* 返回但没进 bfcache：尝试恢复离开位置(一次滚动，不轮询) */
+              try {
+                var y = parseFloat(sessionStorage.getItem(key()) || "0");
+                if (!isNaN(y) && y > 0) {
+                  document.documentElement.style.scrollBehavior = "auto";
+                  window.scrollTo(0, y);
+                  document.documentElement.style.removeProperty("scroll-behavior");
+                }
+              } catch(e){}
+            }
+          });
+        })();
         /* ===== 图片「不阻塞交互」优化(全局) =====
                     只补 HTML 未写的轻量属性，绝不调用 getBoundingClientRect(强制重排会卡主线程)。
                     · decoding=async: 解码不卡主线程

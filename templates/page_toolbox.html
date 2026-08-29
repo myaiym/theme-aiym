@@ -12,7 +12,7 @@
         margin-right: .12em; vertical-align: middle; line-height: 1; font-size: 1.02em; flex-shrink: 0;
         filter: drop-shadow(0 1px 1px rgba(0,0,0,.05)); text-align: center; }
     /* Header — 排版主导，克制留白 */
-    .tb-head { text-align: center; padding: 28px 0 26px; animation: tbUp .45s ease-out both; }
+    .tb-head { text-align: center; padding: 28px 0 26px; }
     .tb-title {
         font-size: var(--fs-page-title); font-weight: 700; letter-spacing: -0.02em;
         color: var(--color-text-primary); margin: 0 0 8px;
@@ -24,7 +24,7 @@
     }
 
     /* Toolbar: search + cats */
-    .tb-toolbar { animation: tbUp .6s ease-out .06s backwards; margin-bottom: 22px;
+    .tb-toolbar { margin-bottom: 22px;
         position: sticky; top: 47px; z-index: 20; background: var(--color-bg-primary); }
     .tb-search { position: relative; margin-bottom: 14px; max-width: 440px; margin-left: auto; margin-right: auto; }
     .tb-search input {
@@ -82,7 +82,6 @@
         border-radius: 18px;
         cursor: pointer; text-decoration: none; color: inherit;
         transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, border-color .3s ease, background .3s ease;
-        animation: tbUp .5s cubic-bezier(.22,1,.36,1) both;
         overflow: hidden; min-width: 0;
     }
     .tb-card:hover {

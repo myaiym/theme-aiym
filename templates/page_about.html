@@ -217,8 +217,10 @@
                 document.getElementById('ab-qr-img').src = qr;
                 document.getElementById('ab-qr-name').textContent = val;
                 mask.classList.add('show');
-            } else if (navigator.clipboard) {
-                navigator.clipboard.writeText(val);
+            } else if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(val).catch(function(){});
+            } else {
+                try { var ta=document.createElement('textarea'); ta.value=val; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); } catch(e){}
             }
         });
         mask.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });

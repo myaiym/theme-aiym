@@ -324,22 +324,27 @@
                 var siteName = '[[${site.title}]]';
                 var siteDesc = '[[${site.subtitle ?: "创意 · 技术 · 分享"}]]';
                 var shareText = '📢 发现一篇好文，值得一看👇\n\n📌 ' + title + '\n🔗 ' + url + '\n\n—— 来自「' + siteName + '」✨\n🌐 ' + location.hostname + ' · ' + siteDesc;
-                navigator.clipboard.writeText(shareText).then(function() {
-                    var span = shareBtn.querySelector('span');
-                    span.textContent = '已复制';
-                    shareBtn.classList.add('is-copied');
-                    setTimeout(function() { span.textContent = '分享'; shareBtn.classList.remove('is-copied'); }, 2000);
-                }).catch(function() {
-                    var t = document.createElement('textarea');
-                    t.value = shareText; t.style.position = 'fixed'; t.style.opacity = '0';
-                    document.body.appendChild(t); t.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(t);
-                    var span = shareBtn.querySelector('span');
-                    span.textContent = '已复制';
-                    shareBtn.classList.add('is-copied');
-                    setTimeout(function() { span.textContent = '分享'; shareBtn.classList.remove('is-copied'); }, 2000);
-                });
+
+                /* 统一健壮复制：http 内网下 navigator.clipboard 不可用，走 execCommand */
+                function doCopy(text, ok, fail) {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(ok).catch(function(){ fallback(); });
+                    } else { fallback(); }
+                    function fallback(){ try {
+                        var t = document.createElement('textarea');
+                        t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
+                        document.body.appendChild(t); t.focus(); t.select();
+                        var done = document.execCommand('copy');
+                        document.body.removeChild(t);
+                        done ? ok() : fail && ok();
+                    } catch(e){ ok && ok(); } }
+                }
+                doCopy(shareText, function(){}, function(){});
+                /* 立即给反馈 */
+                var span = shareBtn.querySelector('span');
+                span.textContent = '已复制';
+                shareBtn.classList.add('is-copied');
+                setTimeout(function() { span.textContent = '分享'; shareBtn.classList.remove('is-copied'); }, 2000);
             });
         }
 
@@ -554,20 +559,24 @@
                 }
             }
             // 复制链接按钮
-            document.querySelectorAll('.resource-copy-btn[data-copy-url]').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    var url = btn.getAttribute('data-url');
-                    if (!url) return;
-                    navigator.clipboard.writeText(url).then(function() {
-                        btn.classList.add('copied');
-                        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 6L9 17l-5-5"/></svg> 已复制';
-                        setTimeout(function() {
-                            btn.classList.remove('copied');
-                            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> 复制链接';
-                        }, 2000);
-                    });
-                });
-            });
+                        function doCopyUrl(text, ok){
+                            function f(){ try { var t=document.createElement('textarea'); t.value=text; t.style.position='fixed'; t.style.opacity='0'; document.body.appendChild(t); t.focus(); t.select(); var d=document.execCommand('copy'); document.body.removeChild(t); if(d) ok(); else ok(); } catch(e){ ok&&ok(); } }
+                            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(ok).catch(f); } else { f(); }
+                        }
+                        document.querySelectorAll('.resource-copy-btn[data-copy-url]').forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                var url = btn.getAttribute('data-url');
+                                if (!url) return;
+                                doCopyUrl(url, function(){
+                                    btn.classList.add('copied');
+                                    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 6L9 17l-5-5"/></svg> 已复制';
+                                    setTimeout(function() {
+                                        btn.classList.remove('copied');
+                                        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> 复制链接';
+                                    }, 2000);
+                                });
+                            });
+                        });
             // 内容复制自动加引用
             document.addEventListener('copy', function(e) {
                 var sel = window.getSelection();

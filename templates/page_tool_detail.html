@@ -91,7 +91,12 @@
 </style>
 <script>
 function toolCopy(t){
-  if(navigator.clipboard){navigator.clipboard.writeText(t)}
+  /* 健壮复制：http 内网下 navigator.clipboard 不可用，走 execCommand */
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t);
+  } else {
+    try { var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); } catch(e){}
+  }
   var d=document.createElement('div');d.className='tool-copied';d.textContent='✓ 已复制';
   document.body.appendChild(d);setTimeout(function(){d.remove()},1500);
 }

@@ -152,7 +152,7 @@
     <style>
     /* === 热门文章横滑（miniapp 精确对齐） === */
     .hot-section { margin-bottom: 4px; }
-    .section-header { display: flex; align-items: center; gap: 10px; padding: 14px 0 8px; animation: homeCardIn .5s cubic-bezier(.22,1,.36,1) backwards; }
+    .section-header { display: flex; align-items: center; gap: 10px; padding: 14px 0 8px; }
     .section-title { font-size: var(--fs-section-title); font-weight: 700; color: var(--color-text-primary); position: relative; padding-left: 12px; }
     .section-title::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; border-radius: 2px; background: linear-gradient(180deg, var(--color-brand), var(--color-brand-hover)); }
     .section-badge { font-size: 9px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #ff6b35, #e65100); padding: 2px 8px; border-radius: 8px; letter-spacing: 1px; }
@@ -173,12 +173,7 @@
         box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04); display: flex; flex-direction: row;
         scroll-snap-align: start; text-decoration: none; color: inherit;
         transition: transform .32s cubic-bezier(.34,1.56,.64,1), box-shadow .32s cubic-bezier(.34,1.56,.64,1), border-color .28s;
-        animation: homeCardIn .5s cubic-bezier(.22,1,.36,1) backwards;
     }
-    .hot-card:nth-child(2) { animation-delay: .05s; }
-    .hot-card:nth-child(3) { animation-delay: .1s; }
-    .hot-card:nth-child(4) { animation-delay: .15s; }
-    .hot-card:nth-child(5) { animation-delay: .2s; }
     .hot-card:active { transform: scale(0.97); }
     @media (hover: hover) { .hot-card:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 16px 38px rgba(0,0,0,.10); border-color: var(--color-border-secondary); } }
     .hot-cover { width: 100px; min-height: 100px; position: relative; flex-shrink: 0; overflow: hidden; }
@@ -225,11 +220,9 @@
         border: 1px solid var(--color-border-primary);
         box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04); text-decoration: none; color: inherit;
         transition: transform .32s cubic-bezier(.34,1.56,.64,1), box-shadow .32s cubic-bezier(.34,1.56,.64,1), border-color .28s;
-        animation: homeCardIn .55s cubic-bezier(.22,1,.36,1) backwards;
+        -webkit-tap-highlight-color: transparent;
     }
-    .article-card:nth-child(2n) { animation-delay: .06s; }
-    .article-card:nth-child(3n) { animation-delay: .12s; }
-    .article-card:nth-child(4n) { animation-delay: .18s; }
+    .hot-card, .hot-scroll a, .article-card, .category-pill, .section-header, .load-more-hint, .section-badge { -webkit-tap-highlight-color: transparent; }
     .article-card:active { transform: scale(0.98); }
     @media (hover: hover) { .article-card:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 18px 42px rgba(0,0,0,.10); border-color: var(--color-border-secondary); } }
     .article-card__cover { width: 100%; height: 180px; overflow: hidden; }
