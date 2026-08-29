@@ -68,7 +68,7 @@
                            class="hot-card" th:attr="data-href=${post.status?.permalink}">
                             <div class="hot-cover">
                                 <img th:src="${post.spec.cover ?: fallbackCover}"
-                                     th:alt="${post.spec.title}" loading="lazy" class="hot-cover-img">
+                                     th:alt="${post.spec.title}" class="hot-cover-img">
                                 <span class="hot-rank" th:text="'#' + ${iter.count}">#1</span>
                             </div>
                             <div class="hot-body">
@@ -107,7 +107,7 @@
                         <th:block th:each="post : ${allLatest.items}">
                             <a th:href="@{${post.status?.permalink}}" class="article-card" th:attr="data-href=${post.status?.permalink}">
                                 <div class="article-card__cover" th:if="${post.spec.cover}">
-                                    <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" loading="lazy">
+                                    <img th:src="${post.spec.cover}" th:alt="${post.spec.title}">
                                 </div>
                                 <div class="article-card__cover article-card__cover--letter" th:unless="${post.spec.cover}">
                                     <span th:text="${#strings.substring(post.spec.title, 0, 1)}">A</span>
@@ -223,7 +223,6 @@
     }
     .hot-card, .hot-scroll a, .article-card, .category-pill, .section-header, .load-more-hint, .section-badge { -webkit-tap-highlight-color: transparent; }
     .article-card:active { transform: scale(0.98); }
-    @media (hover: none) { .article-card:active { transform: none; } }
     @media (hover: hover) { .article-card:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 18px 42px rgba(0,0,0,.10); border-color: var(--color-border-secondary); } }
     .article-card__cover { width: 100%; height: 180px; overflow: hidden; }
     .article-card__cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
@@ -352,34 +351,6 @@
             return Math.abs(h);
         }
 
-        // 随机封面：同一文章在同一个 2 小时桶内固定同一张，且尽量保证同一桶内不同文章封面不重复。
-        // 桶跨期(2h)自动更换一批封固，实现"随机且随时间变化"。
-        function getRandomCover(seed) {
-            if (!photoUrls || photoUrls.length === 0) return '';
-            var bucket = Math.floor(Date.now() / 7200000);   // 每 2 小时一个桶
-            var key = 'cover-map:' + bucket;
-            var map = null;
-            try {
-                var j = localStorage.getItem(key);
-                map = j ? JSON.parse(j) : null;
-            } catch(e) {}
-            if (!map || !map.bySeed) { map = { bySeed: {}, used: {} }; }
-
-            // 已为该文章分配过 -> 沿用，保证桶内稳定
-            if (map.bySeed[seed] != null) return photoUrls[map.bySeed[seed]];
-
-            // 新文章：优先挑一张本桶内尚未分配过的图（保证互不重复）
-            var idx = -1;
-            for (var n = 0; n < photoUrls.length; n++) {
-                if (!map.used[n]) { idx = n; break; }
-            }
-            if (idx < 0) { idx = Math.floor(Math.random() * photoUrls.length); } // 图库用尽时才允许重复
-
-            map.bySeed[seed] = idx;
-            map.used[idx] = true;
-            try { localStorage.setItem(key, JSON.stringify(map)); } catch(e) {}
-            return photoUrls[idx];
-        }
         var noMore = false;
         var currentCategory = '';
         var sentinel = document.getElementById('load-more-sentinel');
@@ -394,11 +365,11 @@
             var title = (post.spec && post.spec.title) ? post.spec.title : '';
             var visit = (post.stats && post.stats.visit) ? post.stats.visit : 0;
             var comment = (post.stats && post.stats.comment) ? post.stats.comment : 0;
-            var fallbackCover = getRandomCover(post.metadata.name);
+            var fallbackCover = "";
             var card = document.createElement('a');
             card.href = post.status.permalink;
             card.className = 'hot-card';
-            card.innerHTML = '<div class="hot-cover">' + (cover ? '<img src="' + cover + '" alt="' + title + '" loading="lazy" class="hot-cover-img">' : (fallbackCover ? '<img src="' + fallbackCover + '" alt="' + title + '" loading="lazy" class="hot-cover-img">' : '<div class="hot-cover--letter"><span>' + (title.charAt(0) || 'A') + '</span></div>')) + '<span class="hot-rank">#' + rank + '</span></div><div class="hot-body"><h3 class="hot-title">' + title + '</h3><div class="hot-meta"><span class="hot-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>' + visit + '</span></span><span class="hot-dot">·</span><span class="hot-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>' + comment + '</span></span></div></div>';
+            card.innerHTML = '<div class="hot-cover">' + (cover ? '<img src="' + cover + '" alt="' + title + '" class="hot-cover-img">' : (fallbackCover ? '<img src="' + fallbackCover + '" alt="' + title + '" class="hot-cover-img">' : '<div class="hot-cover--letter"><span>' + (title.charAt(0) || 'A') + '</span></div>')) + '<span class="hot-rank">#' + rank + '</span></div><div class="hot-body"><h3 class="hot-title">' + title + '</h3><div class="hot-meta"><span class="hot-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>' + visit + '</span></span><span class="hot-dot">·</span><span class="hot-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>' + comment + '</span></span></div></div>';
             return card;
         }
 
@@ -417,8 +388,8 @@
                     if (tag.spec && tag.spec.displayName) tagsHtml += '<span class="article-card__tag">' + tag.spec.displayName + '</span>';
                 });
             }
-            var randomCover = getRandomCover(post.metadata.name);
-            var coverHtml = cover ? '<div class="article-card__cover"><img src="' + cover + '" alt="' + title + '" loading="lazy"></div>' : (randomCover ? '<div class="article-card__cover"><img src="' + randomCover + '" alt="' + title + '" loading="lazy"></div>' : '<div class="article-card__cover article-card__cover--letter"><span>' + (title.charAt(0) || 'A') + '</span></div>');
+            var randomCover = "";
+            var coverHtml = cover ? '<div class="article-card__cover"><img src="' + cover + '" alt="' + title + '"></div>' : (randomCover ? '<div class="article-card__cover"><img src="' + randomCover + '" alt="' + title + '"></div>' : '<div class="article-card__cover article-card__cover--letter"><span>' + (title.charAt(0) || 'A') + '</span></div>');
             var card = document.createElement('a');
             card.href = post.status.permalink;
             card.className = 'article-card';

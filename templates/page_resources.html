@@ -81,7 +81,6 @@
         scroll-snap-align: start;
     }
     .res-hot-card:active { transform: scale(.98); transition-duration: .1s; }
-    @media (hover: none) { .res-hot-card:active { transform: none; } }
     @media (hover: hover) { .res-hot-card:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,.05), 0 18px 44px rgba(0,0,0,.10); border-color: var(--color-border-secondary); } }
     .res-hot-card a { text-decoration: none; color: inherit; display: block; }
 
@@ -125,7 +124,6 @@
         transition: transform .32s cubic-bezier(.34,1.56,.64,1), box-shadow .32s cubic-bezier(.34,1.56,.64,1), border-color .28s;
     }
     .res-tool-card:active { transform: scale(.98); transition-duration: .08s; }
-    @media (hover: none) { .res-tool-card:active { transform: none; } }
     @media (hover: hover) { .res-tool-card:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 14px 32px rgba(0,0,0,.09); border-color: var(--color-border-secondary); } }
     .res-tool-card a { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px; min-width: 0; width: 100%; }
 

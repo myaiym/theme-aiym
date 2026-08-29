@@ -457,14 +457,25 @@
             var type = navEntry && navEntry.type || "navigate";
             if (type === "reload") { scrollTop(); return; }   /* 手动刷新 -> 回顶 */
             if (type === "back_forward") {
-              /* 返回但没进 bfcache：尝试恢复离开位置(一次滚动，不轮询) */
+              /* 返回且未进 bfcache：页面被重载，卡片是异步渲染的，
+                 需等内容高度足够后再滚动恢复位置（否则 scrollTo 无效会回顶）。
+                 多帧重试，直到位置恢复或超时。 */
               try {
                 var y = parseFloat(sessionStorage.getItem(key()) || "0");
-                if (!isNaN(y) && y > 0) {
-                  document.documentElement.style.scrollBehavior = "auto";
+                if (isNaN(y) || y <= 0) { return; }
+                var r = document.documentElement;
+                var tries = 0;
+                (function attempt() {
+                  r.style.scrollBehavior = "auto";
                   window.scrollTo(0, y);
-                  document.documentElement.style.removeProperty("scroll-behavior");
-                }
+                  r.style.removeProperty("scroll-behavior");
+                  tries++;
+                  var cur = window.scrollY || document.documentElement.scrollTop;
+                  var canHold = (document.documentElement.scrollHeight - innerHeight) >= (y - 40);
+                  if ((cur >= y - 2) || !canHold && tries < 30) {
+                    setTimeout(attempt, 120);  /* 卡片还在加载，继续等高度到位 */
+                  }
+                })();
               } catch(e){}
             }
           });
