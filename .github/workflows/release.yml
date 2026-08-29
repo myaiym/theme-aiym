@@ -23,79 +23,65 @@ jobs:
           THEME_NAME="theme-aiym"
           VERSION="${{ steps.version.outputs.VERSION }}"
           ZIP_NAME="${THEME_NAME}-v${VERSION}.zip"
-
-          # 排除不需要的文件
           zip -r "$ZIP_NAME" . \
             -x ".git/*" \
             -x ".github/*" \
             -x "*.md" \
             -x ".gitignore"
-
-          echo "📦 构建完成: $ZIP_NAME"
+          echo "构建完成: $ZIP_NAME"
           ls -lh "$ZIP_NAME"
 
-      - name: Generate release notes
+      - name: Prepare release notes
         id: notes
         run: |
-          VERSION="${{ steps.version.outputs.VERSION }}"
-          cat << 'EOF' > release_notes.md
-                    ## AIYM-启梦 v${VERSION}
-
-                    ### 📱 移动端体验
-                    - 底部 Tabbar 液态玻璃化：单层玻璃大胶囊（毛玻璃+渐变+圆角），选中项灰色玻璃高亮铺满整个 tab 格、无边框无嵌套
-                    - 移动端页脚间距统一：移除 flex:1/auto 撑底，各页页脚紧贴正文
-                    - 首屏内容优化：资源/工具箱/关于页 hero 压缩，露出更多真实内容
-                    - 首页文章卡移动端紧凑化：封面 180→112px，标题/间距收窄，一屏多卡片
-                    - tabbar 公共变量收敛：液态玻璃渐变/圆角/选中色统一为 `--tab-*` / `--glass-*`
-                    - 所有动效适配 prefers-reduced-motion
-
-                    ### ✨ 新特性
-                    - 布局契约重构：根级 layout.html，17 页面统一迁移校验，兼容 Halo 2.19+
-                    - 分类切换改为应用商店式「下划线 Tab」：首页 / 资源 / 工具统一
-                    - 分类栏 sticky 吸顶 + 背景色，滚动时下方内容独立滑动
-                    - 分类 Tab 字号提升（16px、与内容标题同级）
-                    - 资源推荐卡恢复阅读量显示（热度标识）
-                    - 全局字号变量，统一资源/工具页标题层级字体
-
-                    ### 🎨 Apple 化（视觉体系）
-                    - 详情页（文章/资源）、搜索弹窗 Apple 化（圆角、毛玻璃、入场动画、spring 交互）
-                    - 首页热文 / 资源推荐移动端横向滑动优化
-                    - Hero 图标统一尺寸，修复与文字对齐
-                    - 适配 prefers-reduced-motion
-
-                    ### 🐛 修复
-                    - 横滑卡「滑动后首次点击不跳转」修复
-                    - 首页推荐末张裁剪 修复
-                    - bfcache 滚动恢复逻辑优化
-
-                    ### 🧹 清理
-                    - 删除未使用模板 post_resource / category_resources
-
-                    ### 📦 安装
-                    1. 下载下方 `theme-aiym-v*.zip`
-                    2. Halo 后台 → 外观 → 主题 → 安装主题
-                    3. 上传 zip 文件，等待安装完成
-                    4. 启用主题
-                    5. 升级已有安装：后台「重载主题」刷新样式缓存
-
-                    ### 🔗 相关链接
-                    - 主页: https://www.aiym.fun
-                    - 文档: https://github.com/myaiym/theme-aiym#readme
-                    - 反馈: https://github.com/myaiym/theme-aiym/issues
-                    EOF
-
-          # 替换版本号
-          sed -i "s/\${VERSION}/${VERSION}/g" release_notes.md
+          VER="${{ steps.version.outputs.VERSION }}"
+          {
+            echo "NOTES<<EOF"
+            echo "## AIYM-启梦 v${VER}"
+            echo ""
+            echo "### 移动端体验"
+            echo "- 底部 Tabbar 液态玻璃化: 单层玻璃大胶囊(毛玻璃+渐变+圆角), 选中项灰色玻璃高亮铺满整个 tab 格、无边框无嵌套"
+            echo "- 移动端页脚间距统一: 移除 flex 撑底, 各页页脚紧贴正文"
+            echo "- 首屏内容优化: 资源/工具箱/关于页 hero 压缩, 露出更多真实内容"
+            echo "- 首页文章卡移动端紧凑化: 封面调低、内边距收紧, 一屏多卡片"
+            echo "- tabbar 公共变量收敛: 玻璃渐变/圆角/选中色统一为 --tab-* / --glass-*"
+            echo "- 所有动效适配 prefers-reduced-motion"
+            echo ""
+            echo "### 新特性"
+            echo "- 布局契约重构: 根级 layout.html, 17 页面统一迁移, 兼容 Halo 2.19+"
+            echo "- 分类切换改为下划线 Tab: 首页/资源/工具统一"
+            echo "- 分类栏 sticky 吸顶 + 背景色"
+            echo "- 分类 Tab 字号提升(16px)"
+            echo "- 资源推荐卡恢复阅读量(热度标识)"
+            echo "- 全局字号变量, 统一资源/工具页标题层级"
+            echo ""
+            echo "### Apple 化(视觉体系)"
+            echo "- 详情页(文章/资源)、搜索弹窗 Apple 化(圆角、毛玻璃、入场动画、spring 交互)"
+            echo "- 首页热文/资源推荐移动端横向滑动优化"
+            echo "- 适配 prefers-reduced-motion"
+            echo ""
+            echo "### 修复"
+            echo "- 横滑卡「滑动后首次点击不跳转」"
+            echo "- 首页推荐末张裁剪"
+            echo "- bfcache 滚动恢复逻辑"
+            echo ""
+            echo "### 安装"
+            echo "1. 下载 theme-aiym-v${VER}.zip 并在 Halo 后台安装主题"
+            echo ""
+            echo "### 链接"
+            echo "- 主页: https://www.aiym.fun"
+            echo "- 文档: https://github.com/myaiym/theme-aiym#readme"
+            echo "- 反馈: https://github.com/myaiym/theme-aiym/issues"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           name: "v${{ steps.version.outputs.VERSION }}"
-          body_path: release_notes.md
+          body: ${{ env.NOTES }}
           draft: false
           prerelease: false
-          files: |
-            theme-aiym-v*.zip
-          generate_release_notes: true
+          files: theme-aiym-v*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
