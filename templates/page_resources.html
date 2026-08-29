@@ -86,8 +86,6 @@
 
     .res-hot-cover { width: 100%; height: 160px; overflow: hidden; background: var(--color-bg-tertiary); display: flex; align-items: center; justify-content: center; position: relative; }
     .res-hot-cover img { width: 100%; height: 100%; object-fit: cover; }
-    .res-hot-cover img[loading] { opacity: 0; transition: opacity 0.3s; }
-    .res-hot-cover img.loaded { opacity: 1; }
     .res-hot-cover-letter { font-size: 48px; font-weight: 800; color: rgba(255,255,255,0.85); text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 
     .res-hot-bottom { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
@@ -350,12 +348,12 @@
                 var hasImg = !!icon;
                 h += '<div class="res-hot-card"><a href="'+href+'">';
                 h += '<div class="res-hot-cover">';
-                if (cover) h += '<img src="'+cover+'" alt="" loading="lazy" onload="this.classList.add(\'loaded\')">';
+                if (cover) h += '<img src="'+cover+'" alt="">';
                 else h += '<span class="res-hot-cover-letter">'+title.substring(0,1)+'</span>';
                 h += '</div>';
                 h += '<div class="res-hot-bottom">';
                 h += '<div class="res-hot-icon'+(hasImg?' no-bg':'')+'">';
-                if (icon) h += '<img src="'+icon+'" alt="" loading="lazy">';
+                if (icon) h += '<img src="'+icon+'" alt="">';
                 else h += '<span class="res-hot-icon-letter">'+title.substring(0,1)+'</span>';
                 h += '</div>';
                 h += '<div class="res-hot-info">';
@@ -408,7 +406,7 @@
             div.className = 'res-tool-card';
             var h = '<a href="'+href+'">';
             h += '<div class="res-tool-icon'+(hasImg?' no-bg':'')+'">';
-            if (icon) h += '<img src="'+icon+'" alt="" loading="lazy">';
+            if (icon) h += '<img src="'+icon+'" alt="">';
             else h += '<span class="res-tool-icon-letter">'+title.substring(0,1)+'</span>';
             h += '</div>';
             h += '<div class="res-tool-info">';
@@ -536,6 +534,10 @@
             el.addEventListener('pointerup', endDrag);
             el.addEventListener('pointercancel', endDrag);
             el.addEventListener('dragstart', function(e) { e.preventDefault(); });
+            /* 拖拽横向滑动后松手，会残留一个 click 误触卡片跳转 → 在捕获阶段拦截 */
+            el.addEventListener('click', function(e) {
+                if (moved) { e.preventDefault(); e.stopPropagation(); }
+            }, true);
             /* 滚轮 */
             el.addEventListener('wheel', function(e) {
                 var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;

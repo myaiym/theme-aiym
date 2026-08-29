@@ -450,30 +450,46 @@
             r.style.removeProperty("scroll-behavior");
           }
           window.addEventListener("pageshow", function(ev){
-            if (ev.persisted) {   /* bfcache 命中：页面原样，不动(不重新滚动) */
+            if (ev.persisted) {   /* bfcache 命中：页面原样原位 */
+              /* 返回瞬间可能残留某张卡片的 :active 缩放(手指未松开时被夹)。强刷层复位一次。 */
+              var root = document.documentElement;
+              try {
+                root.classList.add("bfr");
+                setTimeout(function(){ root.classList.remove("bfr"); }, 260);
+              } catch(e){}
               return;
             }
             var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
             var type = navEntry && navEntry.type || "navigate";
             if (type === "reload") { scrollTop(); return; }   /* 手动刷新 -> 回顶 */
             if (type === "back_forward") {
-              /* 返回且未进 bfcache：页面被重载，卡片是异步渲染的，
-                 需等内容高度足够后再滚动恢复位置（否则 scrollTo 无效会回顶）。
-                 多帧重试，直到位置恢复或超时。 */
+              /* 返回且未进 bfcache:页面被重载,卡片异步渲染。
+                 等高度足够后滚动到离开位置(否则 scrollTo 无效会回顶)。
+                 ⚠️ 若用户立刻开始手动滑动,必须立即中止恢复,不能反复 scrollTo 拖回
+                 (否则用户上下滑动会被拖回原位、感觉"无法正常滑/闪")。 */
               try {
                 var y = parseFloat(sessionStorage.getItem(key()) || "0");
                 if (isNaN(y) || y <= 0) { return; }
                 var r = document.documentElement;
+                var cancelled = false;
+                function stop(){ cancelled = true; window.removeEventListener("wheel", stop); window.removeEventListener("touchstart", stop); window.removeEventListener("pointerdown", stop); }
+                window.addEventListener("wheel", stop);
+                window.addEventListener("touchstart", stop);
+                window.addEventListener("pointerdown", stop);
                 var tries = 0;
                 (function attempt() {
+                  if (cancelled) { return; }
                   r.style.scrollBehavior = "auto";
                   window.scrollTo(0, y);
                   r.style.removeProperty("scroll-behavior");
                   tries++;
                   var cur = window.scrollY || document.documentElement.scrollTop;
+                  if (cur >= y - 2) { stop(); return; }              /* 已到 */
                   var canHold = (document.documentElement.scrollHeight - innerHeight) >= (y - 40);
-                  if ((cur >= y - 2) || !canHold && tries < 30) {
-                    setTimeout(attempt, 120);  /* 卡片还在加载，继续等高度到位 */
+                  if (!canHold && tries < 12) {                     /* 高度未够,等卡片渲染后再试 */
+                    setTimeout(attempt, 150);
+                  } else {
+                    stop();                                          /* 高度够了仍滚不到就放弃,交还用户 */
                   }
                 })();
               } catch(e){}
