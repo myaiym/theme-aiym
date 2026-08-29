@@ -6,7 +6,7 @@
 <th:block th:fragment="content">
     <style>
     .ab { max-width: 720px; margin: 0 auto; padding: 28px 0 72px; }
-    @media (max-width: 767px) { .ab { padding: 18px 14px 64px; } }
+    @media (max-width: 767px) { .ab { padding: 14px 14px 60px; } .ab-hero { padding: 12px 0 10px; } .ab-hero__logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 10px; } .ab-hero__logo img { width: 34px; height: 34px; } .ab-hero__name { font-size: 18px; } .ab-hero__slogan { font-size: 12px; margin-top: 3px; letter-spacing: 1.5px; } .ab-hero__wave { font-size: 15px; margin-top: 6px; } }
 
     /* Hero */
     .ab-hero { text-align: center; padding: 28px 0 20px; animation: abUp .45s ease-out both; }
@@ -24,6 +24,15 @@
     .ab-hero__slogan { font-size: 13px; color: var(--color-text-muted); margin-top: 5px; letter-spacing: 2px; }
     .ab-hero__wave { display: inline-block; font-size: 18px; margin-top: 10px; animation: abWave 2s ease-in-out infinite; }
     @keyframes abWave { 0%,100%{transform:rotate(0)} 25%{transform:rotate(14deg)} 75%{transform:rotate(-8deg)} }
+
+    @media (max-width: 767px) {
+        .ab-hero { padding: 12px 0 10px; }
+        .ab-hero__logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 10px; }
+        .ab-hero__logo img { width: 34px; height: 34px; }
+        .ab-hero__name { font-size: 18px; }
+        .ab-hero__slogan { font-size: 12px; margin-top: 3px; letter-spacing: 1.5px; }
+        .ab-hero__wave { font-size: 15px; margin-top: 6px; }
+    }
 
     /* Content */
     .ab-content {

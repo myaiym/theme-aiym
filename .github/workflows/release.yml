@@ -39,40 +39,50 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
           cat << 'EOF' > release_notes.md
-          ## AIYM-启梦 v${VERSION}
+                    ## AIYM-启梦 v${VERSION}
 
-          ### ✨ 新特性
-          - 布局契约重构：根级 layout.html，17 页面统一迁移校验，兼容 Halo 2.19+
-          - 分类切换改为应用商店式「下划线 Tab」：首页 / 资源 / 工具统一
-          - 分类/资源栏 sticky 吸顶 + 背景色，下方内容独立滚动
-          - 资源推荐卡恢复阅读量显示（热度标识）
-          - 全局字号变量，统一资源/工具页标题层级字体
+                    ### 📱 移动端体验
+                    - 底部 Tabbar 液态玻璃化：单层玻璃大胶囊（毛玻璃+渐变+圆角），选中项灰色玻璃高亮铺满整个 tab 格、无边框无嵌套
+                    - 移动端页脚间距统一：移除 flex:1/auto 撑底，各页页脚紧贴正文
+                    - 首屏内容优化：资源/工具箱/关于页 hero 压缩，露出更多真实内容
+                    - 首页文章卡移动端紧凑化：封面 180→112px，标题/间距收窄，一屏多卡片
+                    - tabbar 公共变量收敛：液态玻璃渐变/圆角/选中色统一为 `--tab-*` / `--glass-*`
+                    - 所有动效适配 prefers-reduced-motion
 
-          ### 🎨 交互 & 视觉
-          - 详情页（文章/资源）、搜索弹窗 Apple 化（圆角、毛玻璃、入场动画）
-          - 首页热文 / 资源推荐移动端横向滑动优化
-          - Hero 图标统一尺寸，修复与文字对齐
-          - 适配 prefers-reduced-motion
+                    ### ✨ 新特性
+                    - 布局契约重构：根级 layout.html，17 页面统一迁移校验，兼容 Halo 2.19+
+                    - 分类切换改为应用商店式「下划线 Tab」：首页 / 资源 / 工具统一
+                    - 分类栏 sticky 吸顶 + 背景色，滚动时下方内容独立滑动
+                    - 分类 Tab 字号提升（16px、与内容标题同级）
+                    - 资源推荐卡恢复阅读量显示（热度标识）
+                    - 全局字号变量，统一资源/工具页标题层级字体
 
-          ### 🐛 修复
-          - 横滑卡「滑动后首次点击不跳转」修复
-          - 首页推荐末张裁剪 修复
-          - bfcache 滚动恢复逻辑优化
+                    ### 🎨 Apple 化（视觉体系）
+                    - 详情页（文章/资源）、搜索弹窗 Apple 化（圆角、毛玻璃、入场动画、spring 交互）
+                    - 首页热文 / 资源推荐移动端横向滑动优化
+                    - Hero 图标统一尺寸，修复与文字对齐
+                    - 适配 prefers-reduced-motion
 
-          ### 🧹 清理
-          - 删除未使用模板 post_resource / category_resources
+                    ### 🐛 修复
+                    - 横滑卡「滑动后首次点击不跳转」修复
+                    - 首页推荐末张裁剪 修复
+                    - bfcache 滚动恢复逻辑优化
 
-          ### 📦 安装
-          1. 下载下方 `theme-aiym-v*.zip`
-          2. Halo 后台 → 外观 → 主题 → 安装主题
-          3. 上传 zip 文件，等待安装完成
-          4. 启用主题
+                    ### 🧹 清理
+                    - 删除未使用模板 post_resource / category_resources
 
-          ### 🔗 相关链接
-          - 主页: https://www.aiym.fun
-          - 文档: https://github.com/myaiym/theme-aiym#readme
-          - 反馈: https://github.com/myaiym/theme-aiym/issues
-          EOF
+                    ### 📦 安装
+                    1. 下载下方 `theme-aiym-v*.zip`
+                    2. Halo 后台 → 外观 → 主题 → 安装主题
+                    3. 上传 zip 文件，等待安装完成
+                    4. 启用主题
+                    5. 升级已有安装：后台「重载主题」刷新样式缓存
+
+                    ### 🔗 相关链接
+                    - 主页: https://www.aiym.fun
+                    - 文档: https://github.com/myaiym/theme-aiym#readme
+                    - 反馈: https://github.com/myaiym/theme-aiym/issues
+                    EOF
 
           # 替换版本号
           sed -i "s/\${VERSION}/${VERSION}/g" release_notes.md

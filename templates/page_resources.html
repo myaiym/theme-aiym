@@ -16,7 +16,8 @@
     .res-hero__desc { font-size: var(--fs-card-desc); color: var(--color-text-muted); animation: resCardIn .6s cubic-bezier(.22,1,.36,1) .08s backwards; }
 
     @media (max-width: 767px) {
-        .res-hero__title { font-size: var(--fs-page-title); }
+        .res-hero { padding: 10px 0 2px; margin-bottom: 2px; }
+        .res-hero__title { font-size: 20px; margin-bottom: 2px; }
         .res-hero__desc { font-size: 11px; }
     }
 
@@ -264,7 +265,7 @@
         }
 
         var API = '/apis/api.content.halo.run/v1alpha1/';
-        var CAT_API = '/apis/content.halo.run/v1alpha1/categories';
+        var CAT_API = '/apis/api.content.halo.run/v1alpha1/categories';
         var currentCat = '';
         var childCatNames = [];
         var currentPage = 1;
@@ -314,10 +315,10 @@
         /* ===== 分类筛选 ===== */
         function renderFilter(cats) {
             var el = document.getElementById('res-filter');
-            if (!el || !cats.length) { if (el) el.innerHTML = ''; return; }
-            childCatNames = cats.map(function(c) { return c.metadata.name; });
+            if (!el) return;
+            childCatNames = (cats || []).map(function(c) { return c.metadata.name; });
             var h = '<button type="button" class="res-filter-chip active" data-cat="">全部</button>';
-            cats.forEach(function(c) {
+            (cats || []).forEach(function(c) {
                 h += '<button type="button" class="res-filter-chip" data-cat="'+c.metadata.name+'">'+c.spec.displayName+'</button>';
             });
             el.innerHTML = h;
