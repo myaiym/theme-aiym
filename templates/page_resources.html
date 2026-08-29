@@ -107,9 +107,8 @@
     .res-hot-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .res-hot-stats { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-muted); }
     .res-hot-stat { display: inline-flex; align-items: center; gap: 3px; }
-    .res-hot-btn { padding: 5px 14px; border-radius: 999px; background: rgba(var(--color-brand-rgb), 0.12); font-size: 12px; color: var(--color-brand); font-weight: 600; transition: background .25s cubic-bezier(.22,1,.36,1), color .25s; border: 1px solid rgba(var(--color-brand-rgb),0); }
-    /* 桌面鼠标悬停才变深蓝；触屏点击不粘滞深蓝(Apple: 触屏无 hover) */
-    @media (hover: hover) { .res-hot-card:hover .res-hot-btn { background: var(--color-brand); color: #fff; box-shadow: 0 3px 10px rgba(66,165,245,.35); } }
+    .res-hot-stats { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-muted); }
+    .res-hot-stat { display: inline-flex; align-items: center; gap: 3px; }
 
     /* 全部资源 */
     .res-tool-grid { display: grid; grid-template-columns: 1fr; gap: 8px; padding-bottom: 12px; }
@@ -145,8 +144,6 @@
     .res-tool-tag { font-size: 9px; color: var(--color-brand); background: rgba(var(--color-brand-rgb), 0.08); padding: 2px 7px; border-radius: 7px; font-weight: 500; white-space: nowrap; }
     .res-tool-stats { display: flex; align-items: center; gap: 6px; flex-shrink: 0; font-size: 11px; color: var(--color-text-muted); }
     .res-tool-stat { display: flex; align-items: center; gap: 3px; }
-    .res-tool-btn { padding: 5px 14px; border-radius: 999px; background: rgba(var(--color-brand-rgb), 0.12); font-size: 12px; color: var(--color-brand); font-weight: 600; transition: background .25s, color .25s; }
-    @media (hover: hover) { .res-tool-card:hover .res-tool-btn { background: var(--color-brand); color: #fff; box-shadow: 0 3px 10px rgba(66,165,245,.32); } }
 
     .res-empty { text-align: center; padding: 48px 16px; color: var(--color-text-muted); }
     .res-empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
@@ -192,7 +189,6 @@
                 .res-hot-desc { display: none; }
                 .res-hot-stats { display: inline-flex; }
                 .res-hot-stat { font-size: 10px; }
-                .res-hot-btn { padding: 5px 11px; font-size: 11px; }
                 .res-hot-name { font-size: 13px; }
     }
     </style>
@@ -364,7 +360,6 @@
                 h += '<div class="res-hot-stats">';
                 h += '<span class="res-hot-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+visit+'</span>';
                 h += '</div>';
-                h += '<span class="res-hot-btn">详情</span>';
                 h += '</div></div></a></div>';
             });
             h += '</div>';
@@ -423,7 +418,6 @@
             h += '<span class="res-tool-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'+visit+'</span>';
             h += '<span class="res-tool-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+comment+'</span>';
             h += '</div>';
-            h += '<span class="res-tool-btn">详情</span>';
             h += '</div></a>';
             div.innerHTML = h;
             return div;
