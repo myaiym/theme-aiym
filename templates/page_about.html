@@ -6,10 +6,10 @@
 <th:block th:fragment="content">
     <style>
     .ab { max-width: 720px; margin: 0 auto; padding: 28px 0 72px; }
-    @media (max-width: 767px) { .ab { padding: 14px 14px 60px; } .ab-hero { padding: 12px 0 10px; } .ab-hero__logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 10px; } .ab-hero__logo img { width: 34px; height: 34px; } .ab-hero__name { font-size: 18px; } .ab-hero__slogan { font-size: 12px; margin-top: 3px; letter-spacing: 1.5px; } .ab-hero__wave { font-size: 15px; margin-top: 6px; } }
+    @media (max-width: 767px) { .site-content { padding-bottom: 50px; } .ab { padding: 14px 14px 0; } .ab > :last-child { margin-bottom: 0; } .ab-hero { padding: 12px 0 10px; } .ab-hero__logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 10px; } .ab-hero__logo img { width: 34px; height: 34px; } .ab-hero__name { font-size: 18px; } .ab-hero__slogan { font-size: 12px; margin-top: 3px; letter-spacing: 1.5px; } .ab-hero__wave { font-size: 15px; margin-top: 6px; } }
 
     /* Hero */
-    .ab-hero { text-align: center; padding: 28px 0 20px; animation: abUp .45s ease-out both; }
+    .ab-hero { text-align: center; padding: 28px 0 20px; }
     .ab-hero__logo {
         width: 76px; height: 76px; border-radius: 20px; margin: 0 auto 14px;
         display: flex; align-items: center; justify-content: center;
@@ -17,13 +17,12 @@
         box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden;
         transition: transform .3s ease;
     }
-    .ab-hero__logo:hover { transform: scale(1.06) rotate(-2deg); }
+    @media (hover: hover) { .ab-hero__logo:hover { transform: scale(1.06) rotate(-2deg); } }
     .ab-hero__logo img { width: 46px; height: 46px; object-fit: contain; }
     .ab-hero__name { font-size: 22px; font-weight: 700; color: var(--color-text-primary); letter-spacing: .5px; }
-    [data-theme="dark"] .ab-hero__name { color: #f0ece6; }
+
     .ab-hero__slogan { font-size: 13px; color: var(--color-text-muted); margin-top: 5px; letter-spacing: 2px; }
-    .ab-hero__wave { display: inline-block; font-size: 18px; margin-top: 10px; animation: abWave 2s ease-in-out infinite; }
-    @keyframes abWave { 0%,100%{transform:rotate(0)} 25%{transform:rotate(14deg)} 75%{transform:rotate(-8deg)} }
+    .ab-hero__wave { display: inline-flex; width: 20px; height: 20px; margin-top: 10px; color: var(--color-brand-text); }
 
     @media (max-width: 767px) {
         .ab-hero { padding: 12px 0 10px; }
@@ -39,13 +38,13 @@
         background: var(--color-bg-secondary); border-radius: 16px; padding: 24px 22px;
         margin-bottom: 14px; border: 1px solid var(--color-border-primary);
         box-shadow: 0 2px 12px rgba(0,0,0,0.04); font-size: 15px; line-height: 1.8;
-        color: var(--color-text-secondary); animation: abUp .45s ease-out .08s both;
+        color: var(--color-text-secondary);
     }
-    [data-theme="dark"] .ab-content { background: #1e1e1e; border-color: #2a2a2a; }
+
     .ab-content :first-child { margin-top: 0; }
     .ab-content :last-child { margin-bottom: 0; }
     .ab-content h2, .ab-content h3 { color: var(--color-text-primary); font-weight: 700; margin: 20px 0 10px; }
-    [data-theme="dark"] .ab-content h2, [data-theme="dark"] .ab-content h3 { color: #f0ece6; }
+
     .ab-content h2 { font-size: 18px; }
     .ab-content h3 { font-size: 16px; }
     .ab-content p { margin: 0 0 12px; }
@@ -62,31 +61,35 @@
 
     /* Contact */
     .ab-contact {
-        background: var(--color-bg-secondary); border-radius: 16px; padding: 6px 20px;
+        background: var(--color-bg-secondary); border-radius: 16px; padding: 8px;
         margin-bottom: 14px; border: 1px solid var(--color-border-primary);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04); animation: abUp .45s ease-out .16s both;
+        box-shadow: none;
     }
-    [data-theme="dark"] .ab-contact { background: #1e1e1e; border-color: #2a2a2a; }
+
     .ab-contact__item {
-        display: flex; align-items: center; gap: 12px; padding: 13px 0;
-        border-bottom: 1px solid var(--color-border-secondary); cursor: pointer; transition: opacity .2s;
+        width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px;
+        border: none; border-radius: 12px; cursor: pointer;
+        transition: background-color .18s ease, opacity .15s ease;
+        background: transparent; color: inherit; text-align: left; text-decoration: none;
     }
-    .ab-contact__item:last-child { border-bottom: none; }
-    .ab-contact__item:hover { opacity: .75; }
+    .ab-contact__item + .ab-contact__item { border-top: 1px solid var(--color-border-secondary); }
+    .ab-contact__item:active { background: var(--color-brand-light); opacity: .72; }
+    .ab-contact__item:focus-visible { outline: 2px solid var(--color-brand); outline-offset: -2px; }
+    @media (hover: hover) { .ab-contact__item:hover { background: var(--color-bg-tertiary); } }
     .ab-contact__icon {
         width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
         display: flex; align-items: center; justify-content: center;
     }
     .ab-contact__icon span { font-size: 20px; }
     .ab-contact__info { flex: 1; min-width: 0; }
-    .ab-contact__label { font-size: 11px; color: var(--color-text-muted); display: block; text-transform: uppercase; letter-spacing: .5px; }
+    .ab-contact__label { font-size: 11px; color: var(--color-text-secondary); display: block; text-transform: uppercase; letter-spacing: .5px; }
     .ab-contact__val { font-size: 14px; color: var(--color-text-primary); font-weight: 500; margin-top: 1px; display: block; }
     .ab-contact__btn {
-        font-size: 12px; color: var(--color-brand); font-weight: 600;
-        padding: 4px 14px; background: var(--color-brand-light); border-radius: 20px;
-        flex-shrink: 0; text-decoration: none; transition: all .2s;
+        min-width: 58px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center;
+        font-size: 12px; color: #fff; font-weight: 700;
+        padding: 4px 14px; background: var(--color-brand); border: 1px solid var(--color-brand); border-radius: 20px;
+        flex-shrink: 0; text-decoration: none; box-shadow: none;
     }
-    .ab-contact__btn:hover { background: var(--color-brand); color: #fff; }
 
     /* QR Modal */
     .ab-qr-mask {
@@ -96,10 +99,11 @@
     }
     .ab-qr-mask.show { display: flex; }
     .ab-qr-box {
-        background: var(--color-bg-secondary); border-radius: 20px; padding: 28px 24px 22px;
+        position: relative; background: var(--color-bg-secondary); border-radius: 20px; padding: 28px 24px 22px;
         display: flex; flex-direction: column; align-items: center; width: 260px;
         box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: abPop .3s cubic-bezier(.34,1.56,.64,1);
     }
+    .ab-qr-close { position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--color-text-secondary); }
     .ab-qr-title { font-size: 16px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 16px; }
     .ab-qr-img { width: 180px; height: 180px; border-radius: 12px; border: 1px solid var(--color-border-primary); }
     .ab-qr-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); margin-top: 14px; }
@@ -107,6 +111,9 @@
 
     @keyframes abUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
     @keyframes abPop { from{opacity:0;transform:scale(.88)} to{opacity:1;transform:scale(1)} }
+    @media (prefers-reduced-transparency: reduce) {
+        .ab-qr-mask { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(0,0,0,.62); }
+    }
     </style>
 
     <div class="ab page-content">
@@ -119,7 +126,7 @@
             </div>
             <div class="ab-hero__name" th:text="${site.title}">AIYM-启梦</div>
             <div class="ab-hero__slogan" th:text="${site.subtitle ?: '创意 · 技术 · 分享'}">创意 · 技术 · 分享</div>
-            <div class="ab-hero__wave">👋</div>
+            <span class="ab-hero__wave iconify" data-icon="ri-hand-heart-line" aria-hidden="true"></span>
         </div>
 
         <!-- 主体内容: 后台 HTML 配置 -->
@@ -131,9 +138,10 @@
     </div>
 
     <!-- QR 弹窗 -->
-    <div class="ab-qr-mask" id="ab-qr-mask">
-        <div class="ab-qr-box">
-            <div class="ab-qr-title">扫一扫关注 📱</div>
+    <div class="ab-qr-mask" id="ab-qr-mask" role="dialog" aria-modal="true" aria-labelledby="ab-qr-title" aria-hidden="true">
+        <div class="ab-qr-box" tabindex="-1">
+            <button type="button" class="ab-qr-close" id="ab-qr-close" aria-label="关闭二维码"><span class="iconify" data-icon="ri-close-line" aria-hidden="true"></span></button>
+            <div class="ab-qr-title" id="ab-qr-title">扫一扫关注</div>
             <img class="ab-qr-img" id="ab-qr-img" src="" alt="二维码">
             <div class="ab-qr-name" id="ab-qr-name"></div>
             <div class="ab-qr-hint">微信搜索关注</div>
@@ -173,7 +181,9 @@
             var btnText = showQr ? '查看' : actionText[act];
             var qrAttr = showQr ? ' data-qr="' + esc(qrUrl) + '"' : '';
 
-            h += '<div class="ab-contact__item" data-action="' + act + '" data-val="' + esc(lnk.value || '') + '"' + qrAttr + '>';
+            var tag = act === 'copy' ? 'button' : 'a';
+            var targetAttr = act === 'link' ? ' href="' + esc(href) + '" target="_blank" rel="noopener"' : (act === 'mail' ? ' href="mailto:' + esc(lnk.value || '') + '"' : ' type="button"');
+            h += '<' + tag + ' class="ab-contact__item" data-action="' + act + '" data-val="' + esc(lnk.value || '') + '"' + qrAttr + targetAttr + '>';
             h += '<div class="ab-contact__icon">';
             h += '<span class="iconify" data-icon="' + esc(lnk.icon || '') + '"></span>';
             h += '</div>';
@@ -181,49 +191,54 @@
             h += '<span class="ab-contact__label">' + esc(lnk.label || '') + '</span>';
             h += '<span class="ab-contact__val">' + esc(lnk.value || '') + '</span>';
             h += '</div>';
-            if (act === 'link') {
-                h += '<a class="ab-contact__btn" href="' + esc(href) + '" target="_blank" rel="noopener">' + btnText + '</a>';
-            } else if (act === 'mail') {
-                h += '<a class="ab-contact__btn" href="mailto:' + esc(lnk.value || '') + '">' + btnText + '</a>';
-            } else {
-                h += '<span class="ab-contact__btn">' + btnText + '</span>';
-            }
-            h += '</div>';
+            h += '<span class="ab-contact__btn" aria-hidden="true">' + btnText + '</span>';
+            h += '</' + tag + '>';
         });
         el.innerHTML = h;
 
-        /* 所有 <a> 原生链接阻止冒泡 */
-        el.querySelectorAll('.ab-contact__btn[href]').forEach(function(a) {
-            a.addEventListener('click', function(e) { e.stopPropagation(); });
-        });
+        var closeBtn = document.getElementById('ab-qr-close');
+        var lastFocus = null;
+        function openQr(qr, val) {
+            lastFocus = document.activeElement;
+            document.getElementById('ab-qr-img').src = qr;
+            document.getElementById('ab-qr-name').textContent = val;
+            mask.classList.add('show');
+            mask.setAttribute('aria-hidden', 'false');
+            closeBtn.focus();
+        }
+        function closeQr() {
+            mask.classList.remove('show');
+            mask.setAttribute('aria-hidden', 'true');
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+        }
 
-        /* 事件委托 */
+        /* 复制类操作使用原生 button；链接和邮件由原生 a 处理。 */
         el.addEventListener('click', function(e) {
             var item = e.target.closest('.ab-contact__item');
             if (!item) return;
             var action = item.getAttribute('data-action');
             var val = item.getAttribute('data-val');
-            if (action === 'link') {
-                window.open(val.indexOf('http') === 0 ? val : 'https://' + val, '_blank');
-                return;
-            }
-            if (action === 'mail') {
-                window.location.href = 'mailto:' + val;
-                return;
-            }
+            if (action !== 'copy') return;
             /* copy */
             var qr = item.getAttribute('data-qr');
             if (qr) {
-                document.getElementById('ab-qr-img').src = qr;
-                document.getElementById('ab-qr-name').textContent = val;
-                mask.classList.add('show');
+                openQr(qr, val);
             } else if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(val).catch(function(){});
             } else {
                 try { var ta=document.createElement('textarea'); ta.value=val; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); } catch(e){}
             }
         });
-        mask.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+        closeBtn.addEventListener('click', closeQr);
+        mask.addEventListener('click', function(e) { if (e.target === this) closeQr(); });
+        document.addEventListener('keydown', function(e) {
+            if (!mask.classList.contains('show')) return;
+            if (e.key === 'Escape') { closeQr(); return; }
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                closeBtn.focus();
+            }
+        });
 
         function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     })();

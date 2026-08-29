@@ -202,7 +202,7 @@
 
     </style>
 
-    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version})}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version + '-apple4'})}">
 
     <!-- 搜索弹窗样式（必须在 style.css 之后，确保覆盖） -->
     <style>
@@ -219,7 +219,7 @@
     /* 搜索框区域 */
     .search-modal__bar { padding: 12px 16px; background: rgba(var(--color-brand-rgb), 0.03); border-bottom: 1px solid var(--color-border-primary); }
     [data-theme="dark"] .search-modal__bar { background: rgba(255,255,255,0.02); border-bottom-color: rgba(255,255,255,0.06); }
-    .search-modal__input-wrap { display: flex; align-items: center; background: var(--color-bg-secondary); border-radius: 16px; padding: 10px 12px 10px 14px; border: 1.5px solid var(--color-border-primary); transition: all 0.3s cubic-bezier(.22,1,.36,1); }
+    .search-modal__input-wrap { display: flex; align-items: center; background: var(--color-bg-secondary); border-radius: 16px; padding: 10px 12px 10px 14px; border: 1.5px solid var(--color-border-primary); transition: border-color .25s ease, box-shadow .25s ease; }
     .search-modal__input-wrap.focused { border-color: var(--color-brand); box-shadow: 0 0 0 4px rgba(var(--color-brand-rgb), 0.12), 0 6px 20px rgba(var(--color-brand-rgb), 0.10); }
     .search-modal__icon-wrap { width: 26px; height: 26px; border-radius: 9px; background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover)); display: flex; align-items: center; justify-content: center; margin-right: 10px; flex-shrink: 0; }
     .search-modal__icon { color: #fff; }
@@ -250,7 +250,7 @@
     .search-modal__tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 12px; }
 
     /* 搜索历史标签 */
-    .search-modal__tag { padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--color-text-primary); background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: 999px; cursor: pointer; transition: all 0.25s cubic-bezier(.22,1,.36,1); font-family: var(--font-sans); box-shadow: 0 1px 3px rgba(0,0,0,0.03); -webkit-backdrop-filter: saturate(160%) blur(10px); backdrop-filter: saturate(160%) blur(10px); }
+    .search-modal__tag { min-height: 44px; padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--color-text-primary); background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: 999px; cursor: pointer; transition: border-color .2s ease, color .2s ease, background-color .2s ease; font-family: var(--font-sans); box-shadow: none; }
     .search-modal__tag:hover { border-color: rgba(var(--color-brand-rgb), 0.35); color: var(--color-brand); background: rgba(var(--color-brand-rgb), 0.06); transform: translateY(-1px); }
     .search-modal__tag:active { transform: scale(0.94); }
     .search-modal__tag, .search-modal__result, .search-modal__submit, .search-modal__clear, .search-modal__section-action { -webkit-tap-highlight-color: transparent !important; }
@@ -265,7 +265,7 @@
     /* 搜索结果卡片 */
     .search-modal__results { padding: 8px 16px 16px; }
     .search-modal__result-count { font-size: 13px; color: var(--color-text-muted); padding: 4px 0 10px; }
-    .search-modal__result { background: var(--color-bg-secondary); border-radius: 16px; margin-bottom: 8px; padding: 14px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.04); cursor: pointer; transition: all 0.32s cubic-bezier(.34,1.56,.64,1); position: relative; padding-left: 20px; text-decoration: none; color: inherit; display: block; border: 1px solid var(--color-border-secondary); animation: searchResultIn .5s cubic-bezier(.22,1,.36,1) backwards; }
+    .search-modal__result { background: var(--color-bg-secondary); border-radius: 16px; margin-bottom: 8px; padding: 14px 16px; box-shadow: none; cursor: pointer; transition: border-color .22s ease, box-shadow .22s ease; position: relative; padding-left: 20px; text-decoration: none; color: inherit; display: block; border: 1px solid var(--color-border-primary); }
     @keyframes searchResultIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .search-modal__results .search-modal__result:nth-child(2) { animation-delay: .05s; }
     .search-modal__results .search-modal__result:nth-child(3) { animation-delay: .1s; }
@@ -295,7 +295,7 @@
 
     .search-modal__close-btn { display: none; }
     @media (max-width: 767px) {
-        .search-modal__close-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; margin-right: 8px; flex-shrink: 0; border-radius: 10px; background: none; border: none; cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+        .search-modal__close-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: 4px; flex-shrink: 0; border-radius: 12px; background: none; border: none; cursor: pointer; color: var(--color-text-secondary); transition: background-color .2s ease, color .2s ease; -webkit-tap-highlight-color: transparent; }
         .search-modal__close-btn:hover, .search-modal__close-btn:active { background: rgba(0,0,0,0.05); color: var(--color-text-primary); }
         [data-theme="dark"] .search-modal__close-btn:hover, [data-theme="dark"] .search-modal__close-btn:active { background: rgba(255,255,255,0.08); }
     }
@@ -314,6 +314,10 @@
         .search-modal__results { padding: 8px 12px 16px; gap: 10px; display: flex; flex-direction: column; }
         .search-modal__body { padding-bottom: 40px; }
         .search-modal__result-footer { margin-top: 4px; }
+        .search-modal__panel, .search-modal__result { animation: none !important; transform: none; }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+        .search-modal__backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(0,0,0,.62); }
     }
     </style>
     <!-- 动态主题色覆盖 -->
@@ -431,7 +435,7 @@
          th:attr="data-cover-gallery=${theme.config.appearance?.coverGallery ?: '[]'},
                   data-default-cover=${theme.config.basic?.defaultCover ?: ''}"></div>
 
-    <script th:src="@{/assets/js/main.js?v=1.0.4}" defer></script>
+    <script th:src="@{/assets/js/main.js?v=1.0.5-apple3}" defer></script>
         <script>
         (function () {
           /* 返回不刷新、保持原样：

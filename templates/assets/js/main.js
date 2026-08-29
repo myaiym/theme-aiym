@@ -641,6 +641,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var href = link.getAttribute("href");
     if (href && (path === href || (href !== "/" && path.indexOf(href) === 0))) {
       link.classList.add("mobile-nav-item--active");
+      link.setAttribute("aria-current", "page");
     }
   });
 });

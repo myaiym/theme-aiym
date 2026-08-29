@@ -45,7 +45,7 @@
 
     /* 筛选栏（App商店下划线 tab） */
     .res-filter { display: flex; gap: 22px; overflow-x: auto; padding: 0 2px; margin: 4px 0 6px;
-        scrollbar-width: none; position: sticky; top: 47px; z-index: 20;
+        scrollbar-width: none; position: sticky; top: var(--mobile-nav-height); z-index: 20;
         background: var(--color-bg-primary);
         scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
     .res-filter::-webkit-scrollbar { display: none; }
@@ -58,7 +58,7 @@
     .res-filter-chip::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: 0; height: 3px;
         border-radius: 2px; background: var(--color-brand); transform: scaleX(0); transform-origin: center;
         transition: transform .28s cubic-bezier(.22,1,.36,1); }
-    .res-filter-chip.active { color: var(--color-brand); font-weight: 600; }
+    .res-filter-chip.active { color: var(--color-brand-text); font-weight: 600; }
     .res-filter-chip.active::after { transform: scaleX(1); }
     .res-filter-chip:active { opacity: .6; }
 
@@ -96,18 +96,16 @@
         box-shadow: 0 2px 10px rgba(66,165,245,.28);
     }
     .res-hot-icon img { width: 22px; height: 22px; }
-    .res-hot-icon.no-bg { background: transparent !important; box-shadow: none; border-radius: 50%; }
-    .res-hot-icon.no-bg img { width: 100%; height: 100%; }
+    .res-hot-icon.no-bg { background: var(--color-bg-tertiary) !important; box-shadow: none; border-radius: 11px; }
+    .res-hot-icon.no-bg img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
     .res-hot-icon-letter { font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.92); text-shadow: 0 1px 3px rgba(0,0,0,.18); }
 
     .res-hot-info { flex: 1; min-width: 0; overflow: hidden; }
     .res-hot-name { font-size: var(--fs-card-title); font-weight: 600; color: var(--color-text-primary); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .res-hot-desc { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; min-height: 15px; }
+    .res-hot-desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; min-height: 16px; }
 
     .res-hot-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .res-hot-stats { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-muted); }
-    .res-hot-stat { display: inline-flex; align-items: center; gap: 3px; }
-    .res-hot-stats { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-muted); }
+    .res-hot-stats { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-secondary); }
     .res-hot-stat { display: inline-flex; align-items: center; gap: 3px; }
 
     /* 全部资源 */
@@ -117,7 +115,7 @@
         display: flex; align-items: center; gap: 10px; padding: 12px 14px; min-width: 0;
         background: var(--color-bg-secondary); border-radius: 16px;
         border: 1px solid var(--color-border-primary);
-        box-shadow: 0 1px 2px rgba(0,0,0,.03); cursor: pointer;
+        box-shadow: none; cursor: pointer;
         transition: transform .32s cubic-bezier(.34,1.56,.64,1), box-shadow .32s cubic-bezier(.34,1.56,.64,1), border-color .28s;
     }
     .res-tool-card:active { transform: scale(.98); transition-duration: .08s; }
@@ -131,22 +129,22 @@
         box-shadow: 0 2px 8px rgba(66,165,245,.24);
     }
     .res-tool-icon img { width: 22px; height: 22px; }
-    .res-tool-icon.no-bg { background: transparent !important; box-shadow: none; border-radius: 50%; }
-    .res-tool-icon.no-bg img { width: 100%; height: 100%; }
+    .res-tool-icon.no-bg { background: var(--color-bg-tertiary) !important; box-shadow: none; border-radius: 11px; }
+    .res-tool-icon.no-bg img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
     .res-tool-icon-letter { font-size: 18px; font-weight: 800; color: rgba(255,255,255,0.92); text-shadow: 0 1px 3px rgba(0,0,0,.16); }
 
     .res-tool-info { flex: 1; min-width: 0; overflow: hidden; }
     .res-tool-name { font-size: var(--fs-card-title); font-weight: 600; color: var(--color-text-primary); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .res-tool-desc { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; min-height: 15px; }
+    .res-tool-desc { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; min-height: 16px; }
 
     .res-tool-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
     .res-tool-tags { display: flex; gap: 3px; overflow: hidden; }
-    .res-tool-tag { font-size: 9px; color: var(--color-brand); background: rgba(var(--color-brand-rgb), 0.08); padding: 2px 7px; border-radius: 7px; font-weight: 500; white-space: nowrap; }
-    .res-tool-stats { display: flex; align-items: center; gap: 6px; flex-shrink: 0; font-size: 11px; color: var(--color-text-muted); }
+    .res-tool-tag { font-size: 10px; color: var(--color-brand-text); background: rgba(var(--color-brand-rgb), 0.08); padding: 2px 7px; border-radius: 7px; font-weight: 500; white-space: nowrap; }
+    .res-tool-stats { display: flex; align-items: center; gap: 6px; flex-shrink: 0; font-size: 11px; color: var(--color-text-secondary); }
     .res-tool-stat { display: flex; align-items: center; gap: 3px; }
 
     .res-empty { text-align: center; padding: 48px 16px; color: var(--color-text-muted); }
-    .res-empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+    .res-empty-icon { width: 48px; height: 48px; margin: 0 auto 12px; color: var(--color-text-secondary); opacity: 0.65; }
     .res-empty-text { font-size: 14px; }
 
     /* 骨架屏 */
@@ -172,7 +170,10 @@
 
     @media (max-width: 767px) {
         .page-content { padding: 0 8px; }
-        .resources-page { padding: 12px 0 64px; }
+        /* 与首页统一：最后一块内容到页脚保持 50px，页脚到 Duck 栏由 layout 统一处理。 */
+        .site-content { padding-bottom: 50px; }
+        .resources-page { padding: 12px 0 0; }
+        .res-hot-card, .res-tool-card { animation: none !important; }
         /* 推荐横滑卡：移动端缩窄 + 右侧渐隐 → 一眼可滑动 */
         .res-hot-card, .res-skeleton-hot-card { width: 240px; }
         .res-hot-cover { height: 124px; }
@@ -196,16 +197,16 @@
     <div class="resources-page page-content">
         <!-- Hero -->
         <div class="res-hero">
-            <h1 class="res-hero__title"><span class="hero-icon">📦</span>资源中心</h1>
+            <h1 class="res-hero__title"><span class="hero-icon iconify" data-icon="ri-archive-line" aria-hidden="true"></span>资源中心</h1>
             <p class="res-hero__desc">精选工具、插件、教程，一键获取</p>
         </div>
 
         <!-- 分类筛选 -->
-        <div class="res-filter" id="res-filter"></div>
+        <div class="res-filter" id="res-filter" role="tablist" aria-label="资源分类"></div>
 
         <!-- 推荐资源（含骨架屏） -->
         <section class="res-section" id="res-rec">
-            <text class="res-section-title">推荐资源</text>
+            <h2 class="res-section-title">推荐资源</h2>
             <div class="res-skeleton-hot">
                 <div class="res-skeleton-hot-card"><div class="res-skeleton-cover"></div><div class="res-skeleton-bottom"><div class="res-skeleton-icon"></div><div class="res-skeleton-lines"><div class="res-skeleton-bar" style="width:70%"></div><div class="res-skeleton-bar" style="width:50%"></div></div></div></div>
                 <div class="res-skeleton-hot-card"><div class="res-skeleton-cover"></div><div class="res-skeleton-bottom"><div class="res-skeleton-icon"></div><div class="res-skeleton-lines"><div class="res-skeleton-bar" style="width:65%"></div><div class="res-skeleton-bar" style="width:45%"></div></div></div></div>
@@ -215,7 +216,7 @@
 
         <!-- 全部资源（含骨架屏） -->
         <section class="res-section" id="res-all">
-            <text class="res-section-title">全部资源</text>
+            <h2 class="res-section-title">全部资源</h2>
             <div class="res-tool-grid">
                 <div class="res-skeleton-card"><div class="res-skeleton-card-icon"></div><div class="res-skeleton-card-lines"><div class="res-skeleton-card-bar" style="width:60%"></div><div class="res-skeleton-card-bar" style="width:80%"></div></div></div>
                 <div class="res-skeleton-card"><div class="res-skeleton-card-icon"></div><div class="res-skeleton-card-lines"><div class="res-skeleton-card-bar" style="width:55%"></div><div class="res-skeleton-card-bar" style="width:70%"></div></div></div>
@@ -251,7 +252,7 @@
         if (!resourceCat) {
             document.getElementById('res-filter') && document.getElementById('res-filter').remove();
             document.getElementById('res-rec') && document.getElementById('res-rec').remove();
-            document.getElementById('res-all').innerHTML = '<div class="res-empty"><div class="res-empty-icon">⚙️</div><div class="res-empty-text">请在后台「内容设置」中配置资源分类</div></div>';
+            document.getElementById('res-all').innerHTML = '<div class="res-empty"><span class="res-empty-icon iconify" data-icon="ri-settings-3-line" aria-hidden="true"></span><div class="res-empty-text">请在后台「内容设置」中配置资源分类</div></div>';
             return;
         }
 
@@ -310,15 +311,16 @@
             var el = document.getElementById('res-filter');
             if (!el) return;
             childCatNames = (cats || []).map(function(c) { return c.metadata.name; });
-            var h = '<button type="button" class="res-filter-chip active" data-cat="">全部</button>';
+            var h = '<button type="button" role="tab" aria-selected="true" class="res-filter-chip active" data-cat="">全部</button>';
             (cats || []).forEach(function(c) {
-                h += '<button type="button" class="res-filter-chip" data-cat="'+c.metadata.name+'">'+c.spec.displayName+'</button>';
+                h += '<button type="button" role="tab" aria-selected="false" class="res-filter-chip" data-cat="'+c.metadata.name+'">'+c.spec.displayName+'</button>';
             });
             el.innerHTML = h;
             el.querySelectorAll('.res-filter-chip').forEach(function(btn) {
                 btn.addEventListener('click', function() {
-                    el.querySelectorAll('.res-filter-chip').forEach(function(b){ b.classList.remove('active'); });
+                    el.querySelectorAll('.res-filter-chip').forEach(function(b){ b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
                     btn.classList.add('active');
+                    btn.setAttribute('aria-selected', 'true');
                     currentCat = btn.getAttribute('data-cat');
                     currentPage = 1; noMore = false;
                     loadResources(true);
@@ -331,7 +333,7 @@
             var el = document.getElementById('res-rec');
             if (!el) return;
             if (!posts.length) { el.innerHTML = ''; return; }
-            var h = '<text class="res-section-title">推荐资源</text>';
+            var h = '<h2 class="res-section-title">推荐资源</h2>';
             h += '<div class="res-hot-scroll">';
             posts.forEach(function(p) {
                 var cover = getCover(p);
@@ -374,10 +376,10 @@
             if (!el) return;
             if (!append) {
                 if (!posts.length) {
-                    el.innerHTML = '<div class="res-empty"><div class="res-empty-icon">📭</div><div class="res-empty-text">暂无资源文章</div></div>';
+                    el.innerHTML = '<div class="res-empty"><span class="res-empty-icon iconify" data-icon="ri-inbox-line" aria-hidden="true"></span><div class="res-empty-text">暂无资源文章</div></div>';
                     return;
                 }
-                el.innerHTML = '<text class="res-section-title">全部资源</text><div class="res-tool-grid" id="res-grid"></div><div id="res-load-hint" style="text-align:center;padding:16px;font-size:13px;color:var(--color-text-muted);"></div>';
+                el.innerHTML = '<h2 class="res-section-title">全部资源</h2><div class="res-tool-grid" id="res-grid"></div><div id="res-load-hint" style="text-align:center;padding:16px;font-size:13px;color:var(--color-text-muted);"></div>';
             }
             var grid = document.getElementById('res-grid');
             if (!grid) return;

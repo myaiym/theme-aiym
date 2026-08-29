@@ -17,7 +17,7 @@
         font-size: var(--fs-page-title); font-weight: 700; letter-spacing: -0.02em;
         color: var(--color-text-primary); margin: 0 0 8px;
     }
-    [data-theme="dark"] .tb-title { color: #f0ece6; }
+
     .tb-desc {
         font-size: var(--fs-card-desc); color: var(--color-text-muted); margin: 0;
         letter-spacing: 0.5px; font-weight: 400;
@@ -25,7 +25,7 @@
 
     /* Toolbar: search + cats */
     .tb-toolbar { margin-bottom: 22px;
-        position: sticky; top: 47px; z-index: 20; background: var(--color-bg-primary); }
+        position: sticky; top: var(--mobile-nav-height); z-index: 20; background: var(--color-bg-primary); }
     .tb-search { position: relative; margin-bottom: 14px; max-width: 440px; margin-left: auto; margin-right: auto; }
     .tb-search input {
         width: 100%; padding: 13px 44px 13px 18px; font-size: 15px;
@@ -34,7 +34,7 @@
         border-radius: 999px; color: var(--color-text-primary);
         outline: none; transition: border-color .25s, box-shadow .25s, background .25s;
         box-sizing: border-box; font-family: inherit;
-        box-shadow: 0 1px 2px rgba(0,0,0,.03);
+        box-shadow: none;
     }
     .tb-search input::placeholder { color: var(--color-text-muted); }
     .tb-search input:focus {
@@ -59,8 +59,8 @@
     .tb-cat::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: 0; height: 3px;
         border-radius: 2px; background: var(--color-brand); transform: scaleX(0); transform-origin: center;
         transition: transform .28s cubic-bezier(.22,1,.36,1); }
-    .tb-cat:hover { color: var(--color-text-primary); }
-    .tb-cat.active { color: var(--color-brand); font-weight: 600; }
+    @media (hover: hover) { .tb-cat:hover { color: var(--color-text-primary); } }
+    .tb-cat.active { color: var(--color-brand-text); font-weight: 600; }
     .tb-cat.active::after { transform: scaleX(1); }
 
     /* Grid */
@@ -97,7 +97,7 @@
     }
 }
     .tb-card:active { transform: scale(.975); transition-duration: .1s; }
-    [data-theme="dark"] .tb-card { background: rgba(30,30,30,.72); border-color: rgba(255,255,255,.08); }
+    [data-theme="dark"] .tb-card { background: var(--color-bg-secondary); border-color: var(--color-border-primary); }
 
     .tb-icon {
         width: 42px; height: 42px; border-radius: 23%; /* 连续圆角接近 squircle */
@@ -105,7 +105,7 @@
         display: flex; align-items: center; justify-content: center;
         transition: transform .3s cubic-bezier(.34,1.56,.64,1);
     }
-    .tb-card:hover .tb-icon { transform: scale(1.06); }
+    @media (hover: hover) { .tb-card:hover .tb-icon { transform: scale(1.06); } }
 
     .tb-info { flex: 1; min-width: 0; overflow: hidden; }
     .tb-name {
@@ -113,29 +113,29 @@
         display: flex; align-items: center; gap: 6px;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    [data-theme="dark"] .tb-name { color: #f0ece6; }
+
     .tb-desc {
-        font-size: 12px; color: var(--color-text-muted);
+        font-size: 12px; color: var(--color-text-secondary);
         margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
     /* Badge — 柔和胶囊 */
     .tb-badge {
         font-size: 10px; font-weight: 600; padding: 2px 8px;
-        background: var(--color-brand-light); color: var(--color-brand);
+        background: var(--color-brand-light); color: var(--color-brand-text);
         border-radius: 999px; flex-shrink: 0; line-height: 1.4;
     }
 
     /* Count */
     .tb-count {
         font-size: 12px; color: var(--color-text-muted); margin-top: 20px; text-align: center;
-        animation: tbUp .5s ease-out .2s both;
+        animation: none;
     }
 
     /* Empty */
-    .tb-empty { text-align: center; padding: 56px 0; animation: tbUp .5s ease-out both; }
-    .tb-empty__icon { font-size: 44px; margin-bottom: 12px; opacity: .5; }
-    .tb-empty__text { font-size: 14px; color: var(--color-text-muted); }
+    .tb-empty { text-align: center; padding: 56px 0; animation: none; }
+    .tb-empty__icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--color-text-secondary); opacity: .65; }
+    .tb-empty__text { font-size: 14px; color: var(--color-text-secondary); }
 
     @keyframes tbUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
@@ -146,16 +146,18 @@
     }
 
     @media (max-width: 767px) {
-        .tb { padding: 12px 0 80px; }
+        /* 与首页统一：最后一块内容到页脚保持 50px，避免页面自身重复预留底部空间。 */
+        .site-content { padding-bottom: 50px; }
+        .tb { padding: 12px 0 0; }
         .tb-head { padding: 8px 0 6px; }
         .tb-title { font-size: 20px; }
         .tb-desc { font-size: var(--fs-card-desc); }
-        .tb-toolbar { margin-bottom: 8px; top: 47px; }
+        .tb-toolbar { margin-bottom: 8px; top: var(--mobile-nav-height); }
         .tb-search { margin-bottom: 10px; max-width: 100%; }
         .tb-search input { padding: 11px 40px 11px 16px; font-size: 13px; }
         .tb-cats { gap: 22px; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding: 0 2px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .tb-cats::-webkit-scrollbar { display: none; }
-        .tb-cat { padding: 9px 2px; font-size: var(--fs-filter); flex-shrink: 0; }
+        .tb-cat { min-height: 44px; padding: 9px 2px; font-size: var(--fs-filter); flex-shrink: 0; }
         .tb-grid { gap: 10px; padding: 0; max-width: 100%; }
         .tb-card { padding: 12px; gap: 10px; border-radius: 16px; }
         .tb-card:hover { transform: none; border-color: var(--color-border-secondary); background: var(--color-bg-secondary); }
@@ -171,22 +173,22 @@
 
     <div class="tb page-content">
         <div class="tb-head">
-            <h1 class="tb-title"><span class="hero-icon">🧰</span>工具箱</h1>
+            <h1 class="tb-title"><span class="hero-icon iconify" data-icon="ri-tools-line" aria-hidden="true"></span>工具箱</h1>
             <p class="tb-desc">开发利器，随用随走</p>
         </div>
 
         <div class="tb-toolbar">
             <div class="tb-search">
-                <input type="text" id="tb-search" placeholder="搜索工具..." autocomplete="off">
+                <input type="search" id="tb-search" aria-label="搜索工具" placeholder="搜索工具..." autocomplete="off">
                 <span class="tb-search__icon iconify" data-icon="ri-search-line"></span>
             </div>
-            <div class="tb-cats" id="tb-cats"></div>
+            <div class="tb-cats" id="tb-cats" role="tablist" aria-label="工具分类"></div>
         </div>
 
         <div class="tb-grid" id="tb-grid"></div>
-        <div class="tb-count" id="tb-count"></div>
+        <div class="tb-count" id="tb-count" role="status"></div>
         <div class="tb-empty" id="tb-empty" style="display:none">
-            <div class="tb-empty__icon">🔍</div>
+            <span class="tb-empty__icon iconify" data-icon="ri-search-line" aria-hidden="true"></span>
             <div class="tb-empty__text">没有找到匹配的工具</div>
         </div>
     </div>
@@ -252,23 +254,24 @@
                 renderGrid();
             })
             .catch(function() {
-                gridEl.innerHTML = '<div class="tb-empty"><div class="tb-empty__icon">⚠️</div><div class="tb-empty__text">加载失败</div></div>';
+                gridEl.innerHTML = '<div class="tb-empty"><span class="tb-empty__icon iconify" data-icon="ri-error-warning-line" aria-hidden="true"></span><div class="tb-empty__text">加载失败</div></div>';
             });
 
         function renderCats() {
             var catSet = new Set();
             allItems.forEach(function(item) { if (item.cat) catSet.add(item.cat); });
             var allCats = Array.from(catSet);
-            var h = '<button class="tb-cat active" data-cat="all">全部</button>';
+            var h = '<button type="button" role="tab" aria-selected="true" class="tb-cat active" data-cat="all">全部</button>';
             allCats.forEach(function(cat) {
-                h += '<button class="tb-cat" data-cat="' + esc(cat) + '">' + esc(cat) + '</button>';
+                h += '<button type="button" role="tab" aria-selected="false" class="tb-cat" data-cat="' + esc(cat) + '">' + esc(cat) + '</button>';
             });
             catsEl.innerHTML = h;
             catsEl.querySelectorAll('.tb-cat').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     currentCat = this.getAttribute('data-cat');
-                    catsEl.querySelectorAll('.tb-cat').forEach(function(b) { b.classList.remove('active'); });
+                    catsEl.querySelectorAll('.tb-cat').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
                     this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
                     renderGrid();
                 });
             });
@@ -296,8 +299,7 @@
 
             var h = '';
             filtered.forEach(function(item, i) {
-                h += '<a class="tb-card" href="' + esc(item.path) + '"'
-                   + ' style="animation-delay:' + (i * 40) + 'ms">';
+                h += '<a class="tb-card" href="' + esc(item.path) + '">';
                 h += '<div class="tb-icon" style="background:' + esc(item.bg) + '">';
                 h += '<span class="iconify" data-icon="' + esc(item.icon) + '" style="color:' + esc(item.color) + ';font-size:22px"></span>';
                 h += '</div>';
