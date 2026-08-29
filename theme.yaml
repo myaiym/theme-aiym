@@ -13,7 +13,7 @@ spec:
   repo: "https://github.com/tanzs/theme-aiym"
   issues: "https://github.com/tanzs/theme-aiym/issues"
   readme: ""
-  version: "1.0.2"
+  version: "1.1.0"
   requires: ">=2.0.0"
   settingName: "theme-aiym"
   configMapName: "theme-aiym-config"
@@ -21,14 +21,6 @@ spec:
     - name: "MIT"
       url: "https://github.com/tanzs/theme-aiym/blob/main/LICENSE"
   customTemplates:
-    post:
-      - name: resource
-        description: "用于资源类型文章的模板"
-        file: post_resource.html
-    category:
-      - name: resource-category
-        description: "用于资源库分类的模板"
-        file: category_resources.html
     page:
       - name: search
         description: "独立搜索页面"

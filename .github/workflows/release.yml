@@ -39,20 +39,31 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
           cat << 'EOF' > release_notes.md
-          ## theme-aiym v${VERSION}
+          ## AIYM-启梦 v${VERSION}
 
           ### ✨ 新特性
-          - 主题名称更改为 **AIYM-启梦**
-          - 新增蓝色品牌色 Logo
-          - 新增简约主题卡片图
+          - 布局契约重构：根级 layout.html，17 页面统一迁移校验，兼容 Halo 2.19+
+          - 分类切换改为应用商店式「下划线 Tab」：首页 / 资源 / 工具统一
+          - 分类/资源栏 sticky 吸顶 + 背景色，下方内容独立滚动
+          - 资源推荐卡恢复阅读量显示（热度标识）
+          - 全局字号变量，统一资源/工具页标题层级字体
 
-          ### 🔧 优化
-          - 更新 README 文档，面向开发者博客
-          - 完善功能特性说明和使用指南
-          - 更新 GitHub 仓库地址和 Issue 链接
+          ### 🎨 交互 & 视觉
+          - 详情页（文章/资源）、搜索弹窗 Apple 化（圆角、毛玻璃、入场动画）
+          - 首页热文 / 资源推荐移动端横向滑动优化
+          - Hero 图标统一尺寸，修复与文字对齐
+          - 适配 prefers-reduced-motion
+
+          ### 🐛 修复
+          - 横滑卡「滑动后首次点击不跳转」修复
+          - 首页推荐末张裁剪 修复
+          - bfcache 滚动恢复逻辑优化
+
+          ### 🧹 清理
+          - 删除未使用模板 post_resource / category_resources
 
           ### 📦 安装
-          1. 下载下方 `theme-aiym-v*.zip` 文件
+          1. 下载下方 `theme-aiym-v*.zip`
           2. Halo 后台 → 外观 → 主题 → 安装主题
           3. 上传 zip 文件，等待安装完成
           4. 启用主题
