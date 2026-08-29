@@ -241,10 +241,12 @@
     /*<![CDATA[*/
     var _resPhotoUrls = [];
     (function() {
-        var allPhotos = /*[[${#lists.toList(photoFinder.listAll())}]]*/ [];
-        for (var i = 0; i < allPhotos.length; i++) {
-            var p = allPhotos[i];
-            if (p && p.spec && p.spec.url) _resPhotoUrls.push(p.spec.url);
+        var allPhotos = /*[[${photoFinder != null ? #lists.toList(photoFinder.listAll()) : null}]]*/ [];
+        if (allPhotos && allPhotos.length) {
+            for (var i = 0; i < allPhotos.length; i++) {
+                var p = allPhotos[i];
+                if (p && p.spec && p.spec.url) _resPhotoUrls.push(p.spec.url);
+            }
         }
     })();
     /*]]>*/
@@ -286,17 +288,19 @@
         }
         function getRandomCover(seed) {
             if (!photoUrls || photoUrls.length === 0) return '';
-            var cacheKey = 'rescover:' + seed;
-            var cacheTimeKey = cacheKey + ':t';
-            try {
-                var cached = localStorage.getItem(cacheKey);
-                var cachedTime = localStorage.getItem(cacheTimeKey);
-                if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < 7200000) return cached;
-            } catch(e) {}
-            var idx = sha256Hash(seed) % photoUrls.length;
-            var url = photoUrls[idx];
-            try { localStorage.setItem(cacheKey, url); localStorage.setItem(cacheTimeKey, String(Date.now())); } catch(e) {}
-            return url;
+            /* 同首页：2小时桶内固定，不同资源互不重复；跨桶随机换一批 */
+            var bucket = Math.floor(Date.now() / 7200000);
+            var key = 'res-cover-map:' + bucket;
+            var map = null;
+            try { var j = localStorage.getItem(key); map = j ? JSON.parse(j) : null; } catch(e) {}
+            if (!map || !map.bySeed) { map = { bySeed: {}, used: {} }; }
+            if (map.bySeed[seed] != null) return photoUrls[map.bySeed[seed]];
+            var idx = -1;
+            for (var n = 0; n < photoUrls.length; n++) { if (!map.used[n]) { idx = n; break; } }
+            if (idx < 0) idx = Math.floor(Math.random() * photoUrls.length);
+            map.bySeed[seed] = idx; map.used[idx] = true;
+            try { localStorage.setItem(key, JSON.stringify(map)); } catch(e) {}
+            return photoUrls[idx];
         }
         function getCover(p) {
             var cover = (p.spec && p.spec.cover) || '';

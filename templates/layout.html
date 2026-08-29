@@ -481,13 +481,16 @@
           });
 
           /* 返回/前进导航(back_forward)时的恢复逻辑 */
+          var _restored = false;
           function maybeRestore() {
+            if (_restored) return;          /* 只恢复一次，避免多次 scrollTo 造成的闪烁 */
             var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
             var type = navEntry && navEntry.type || "navigate";
             if (type !== "back_forward") return;
             var mode = getMode();
             if (mode === "tab") { scrollTop(); }
             else { restoreY(); }
+            _restored = true;
           }
 
           /* 从 bfcache 恢复(前后缓存)时：Chrome 会恢复 DOM 原有的滚动位置，
@@ -495,13 +498,49 @@
           window.addEventListener("pageshow", function(ev){
             if (ev.persisted) {
               var mode = getMode();
-              if (mode === "tab") scrollTop();   /* tab 跳转回来 -> 回顶 */
-              /* card 回来 -> 保持 bfcache 恢复的位置(=原浏览位置) */
-            } else {
-              maybeRestore();
+              if (mode === "tab") scrollTop();
+              /* card 回来 -> 保持 bfcache 恢复的位置(=原浏览位置，浏览器已恢复) */
             }
           });
 
+          var _restoring = false, _restoreOk = false;
+          /* 关闭浏览器默认滚动恢复(避免刷新/普通跳转被拉回上次位置) */
+          if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+          function doRestore() {
+            if (_restoreOk) return;
+            var de = document.documentElement;
+            var y = parseFloat(sessionStorage.getItem(key()) || "0");
+            de.setAttribute("data-restore", "1");       /* 恢复期间禁用入场动画(防闪) */
+            window.scrollTo(0, y);
+            if (Math.abs(window.scrollY - y) < 4) _restoreOk = true;  /* 已到位 */
+            de.removeAttribute("data-restore");
+          }
+          /* 导航/刷新/返回的滚动策略：
+             - 返回(back_forward)+点卡片 => 恢复原位置
+             - 返回(back_forward)+点tab => 回顶
+             - 刷新(reload)/普通跳转(navigate) => 回顶部(不清残留，但不再恢复) */
+          function maybeRestore() {
+            if (_restoring) return;
+            var navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+            var type = navEntry && navEntry.type || "navigate";
+            _restoring = true;
+            if (type !== "back_forward") {
+              /* 刷新/新访问：回顶部，保证不残留旧位置 */
+              scrollTop();
+              _restoreOk = true;
+              return;
+            }
+            var mode = getMode();
+            if (mode === "tab") { scrollTop(); _restoreOk = true; return; }
+            var tries = 0;
+            (function attempt(){
+              var y = parseFloat(sessionStorage.getItem(key()) || "0");
+              if (isNaN(y) || y <= 0) { _restoreOk = true; return; }   // 无记录，不需恢复
+              doRestore();
+              if (_restoreOk || tries++ > 10) return;
+              setTimeout(attempt, 180);                      // 高度不够则稍后再试
+            })();
+          }
           maybeRestore();
           document.addEventListener("DOMContentLoaded", maybeRestore);
           window.addEventListener("load", maybeRestore);
