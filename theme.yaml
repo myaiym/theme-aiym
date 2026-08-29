@@ -10,8 +10,8 @@ spec:
     website: "https://www.aiym.fun"
   logo: "https://img.aiym.fun/halo/aiym-atnl.svg"
   homepage: "https://www.aiym.fun"
-  repo: "https://github.com/tanzs/theme-aiym"
-  issues: "https://github.com/tanzs/theme-aiym/issues"
+  repo: "https://github.com/myaiym/theme-aiym"
+  issues: "https://github.com/myaiym/theme-aiym/issues"
   readme: ""
   version: "1.1.0"
   requires: ">=2.0.0"
@@ -19,7 +19,7 @@ spec:
   configMapName: "theme-aiym-config"
   license:
     - name: "MIT"
-      url: "https://github.com/tanzs/theme-aiym/blob/main/LICENSE"
+      url: "https://github.com/myaiym/theme-aiym/blob/main/LICENSE"
   customTemplates:
     page:
       - name: search

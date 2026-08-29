@@ -32,5 +32,5 @@
 
 ### 🔗 相关链接
 - 主页: https://www.aiym.fun
-- 文档: https://github.com/tanzs/theme-aiym#readme
-- 反馈: https://github.com/tanzs/theme-aiym/issues
+- 文档: https://github.com/myaiym/theme-aiym#readme
+- 反馈: https://github.com/myaiym/theme-aiym/issues
