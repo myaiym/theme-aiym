@@ -46,14 +46,22 @@
     .tabbar-track { display: flex; align-items: center; padding: 3px; border-radius: 16px; border: 1px solid rgba(255,255,255,.48); background: rgba(255,255,255,.28); box-shadow: inset 0 1px 0 rgba(255,255,255,.56), 0 1px 2px rgba(26,23,20,.04); }
     /* 桌面端菜单轨道适度加宽，避免居中菜单两侧视觉留白过大；中小桌面由下方断点收缩。 */
     .tabbar-item { display: flex; align-items: center; gap: 5px; padding: 7px clamp(18px, 2.4vw, 36px); border-radius: 12px; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: color .2s ease, background-color .2s ease, box-shadow .2s ease; white-space: nowrap; }
-    .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,.34); }
+    @media (hover: hover) and (pointer: fine) {
+        .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,.34); }
+        .tabbar-item:hover .iconify { transform: scale(1.15); }
+        [data-theme="dark"] .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,.10); }
+        .header-action-btn:hover { color: var(--color-brand); background: var(--color-bg-tertiary); }
+        .header-user__trigger:hover { background: rgba(0,0,0,0.06); }
+        .header-user__menu-item:hover { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
+        .header-user__menu-item--danger:hover { background: rgba(244,67,54,0.08); color: var(--color-error); }
+        .mobile-header__action:hover { background: rgba(0,0,0,0.05); }
+        [data-theme="dark"] .mobile-header__action:hover { background: rgba(255,255,255,0.08); }
+    }
     .tabbar-item.active { color: var(--color-brand-text); background: rgba(255,255,255,.62); box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 1px 3px rgba(26,23,20,.07); }
     .tabbar-item .iconify { transition: transform 0.3s; display: inline-flex; align-items: center; overflow: visible; flex-shrink: 0; width: 1.15em; height: 1.15em; margin: 0 -0.07em; }
     .tabbar-item .iconify svg { width: 100%; height: 100%; }
-    .tabbar-item:hover .iconify { transform: scale(1.15); }
     [data-theme="dark"] .tabbar-track { border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.06); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 1px 2px rgba(0,0,0,.12); }
     [data-theme="dark"] .tabbar-item { color: var(--color-text-muted); }
-    [data-theme="dark"] .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,.10); }
     [data-theme="dark"] .tabbar-item.active { color: var(--color-brand-text); background: rgba(255,255,255,.15); box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 1px 3px rgba(0,0,0,.14); }
 
     /* 菜单动画 */
@@ -94,7 +102,6 @@
 
     /* 操作按钮 */
     .header-action-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: var(--color-text-secondary); border-radius: 8px; transition: all 0.2s; background: none; border: none; cursor: pointer; }
-    .header-action-btn:hover { color: var(--color-brand); background: var(--color-bg-tertiary); }
     .header-action-btn svg { width: 18px; height: 18px; }
 
     /* 主题切换 */
@@ -109,7 +116,6 @@
     /* 用户头像区域 */
     .header-user { position: relative; }
     .header-user__trigger { display: flex; align-items: center; gap: 10px; padding: 5px 14px 5px 8px; border-radius: 24px; cursor: pointer; transition: all 0.2s; background: rgba(0,0,0,0.03); text-decoration: none; color: inherit; }
-    .header-user__trigger:hover { background: rgba(0,0,0,0.06); }
     .header-user__trigger--guest { text-decoration: none; }
     .header-user__avatar { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--color-brand); }
     .header-user__avatar img { width: 100%; height: 100%; object-fit: cover; }
@@ -133,9 +139,7 @@
     .header-user__menu-divider { height: 1px; background: var(--color-border-primary); margin: 0 12px; }
     .header-user__menu-options { padding: 6px 8px; }
     .header-user__menu-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; font-size: 13px; color: var(--color-text-secondary); text-decoration: none; transition: all 0.15s; }
-    .header-user__menu-item:hover { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
     .header-user__menu-item--danger { color: var(--color-error); }
-    .header-user__menu-item--danger:hover { background: rgba(244,67,54,0.08); color: var(--color-error); }
 
     /* 移动端头部 */
     .mobile-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 16px; background: rgba(250,248,245,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
@@ -152,12 +156,10 @@
     .mobile-header__sub { font-size: 9px; font-weight: 500; color: var(--color-text-muted); letter-spacing: 0.5px; margin-top: 1px; }
     .mobile-header__right { display: flex; align-items: center; gap: 8px; }
     .mobile-header__action { color: var(--color-text-secondary); padding: 6px; display: flex; text-decoration: none; border-radius: 8px; transition: all 0.2s; background: none; border: none; cursor: pointer; align-items: center; justify-content: center; }
-    .mobile-header__action:hover { background: rgba(0,0,0,0.05); }
     .mobile-header .theme-icon--moon { display: block; }
     .mobile-header .theme-icon--sun { display: none; }
     [data-theme="dark"] .mobile-header__title { color: var(--color-text-primary); }
     [data-theme="dark"] .mobile-header__action { color: var(--color-text-muted); }
-    [data-theme="dark"] .mobile-header__action:hover { background: rgba(255,255,255,0.08); }
     [data-theme="dark"] .mobile-header .theme-icon--moon { display: none; }
     [data-theme="dark"] .mobile-header .theme-icon--sun { display: block; }
 
@@ -254,16 +256,18 @@
         transition: all 0.3s ease;
     }
     .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-    .back-to-top:hover { background: var(--color-brand); color: #fff; box-shadow: 0 4px 16px rgba(var(--color-brand-rgb),0.3); }
     [data-theme="dark"] .back-to-top { background: rgba(30,30,30,0.9); color: var(--color-text-muted); }
-    [data-theme="dark"] .back-to-top:hover { background: var(--color-brand); color: #fff; }
+    @media (hover: hover) and (pointer: fine) {
+        .back-to-top:hover { background: var(--color-brand); color: #fff; box-shadow: 0 4px 16px rgba(var(--color-brand-rgb),0.3); }
+        [data-theme="dark"] .back-to-top:hover { background: var(--color-brand); color: #fff; }
+    }
     @media (max-width: 767px) {
         .back-to-top { bottom: 90px; right: 12px; width: 36px; height: 36px; }
     }
 
     </style>
 
-    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version + '-article-code2'})}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version + '-article-code8'})}">
 
     <!-- 搜索弹窗样式（必须在 style.css 之后，确保覆盖） -->
     <style>
@@ -290,9 +294,14 @@
     .search-modal__input::-webkit-search-decoration { -webkit-appearance: none; margin: 0; }
     .search-modal__input::placeholder { color: var(--color-text-muted); }
     .search-modal__clear { font-size: 16px; color: var(--color-text-muted); padding: 8px; margin-right: 2px; cursor: pointer; background: none; border: none; transition: color 0.2s; line-height: 1; }
-    .search-modal__clear:hover { color: var(--color-text-primary); }
+    @media (hover: hover) and (pointer: fine) {
+        .search-modal__clear:hover { color: var(--color-text-primary); }
+        .search-modal__submit:hover { background: var(--color-brand-hover); box-shadow: 0 2px 8px rgba(var(--color-brand-rgb), 0.3); }
+        .search-modal__section-action:hover { color: var(--color-brand); background: rgba(var(--color-brand-rgb), 0.06); }
+        .search-modal__tag:hover { border-color: rgba(var(--color-brand-rgb), 0.35); color: var(--color-brand); background: rgba(var(--color-brand-rgb), 0.06); transform: translateY(-1px); }
+        .search-modal__result:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.09); border-color: rgba(var(--color-brand-rgb), 0.4); }
+    }
     .search-modal__submit { background: var(--color-brand); color: #fff; font-size: 14px; padding: 6px 16px; border-radius: 12px; margin-left: 6px; flex-shrink: 0; cursor: pointer; border: none; font-weight: 500; font-family: var(--font-sans); transition: all 0.25s cubic-bezier(.22,1,.36,1); }
-    .search-modal__submit:hover { background: var(--color-brand-hover); box-shadow: 0 2px 8px rgba(var(--color-brand-rgb), 0.3); }
     .search-modal__submit:active { opacity: 0.85; transform: scale(0.95); }
 
     /* 内容区 */
@@ -305,14 +314,11 @@
     .search-modal__section-title { font-size: 15px; font-weight: 700; color: var(--color-text-primary); display: flex; align-items: center; gap: 6px; }
     .search-modal__section-title svg { color: var(--color-brand); flex-shrink: 0; }
     .search-modal__section-action { font-size: 12px; color: var(--color-text-muted); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-family: var(--font-sans); display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
-    .search-modal__section-action:hover { color: var(--color-brand); background: rgba(var(--color-brand-rgb), 0.06); }
-
     /* 标签容器 */
     .search-modal__tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 12px; }
 
     /* 搜索历史标签 */
     .search-modal__tag { min-height: 44px; padding: 7px 16px; font-size: 13px; font-weight: 500; color: var(--color-text-primary); background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: 999px; cursor: pointer; transition: border-color .2s ease, color .2s ease, background-color .2s ease; font-family: var(--font-sans); box-shadow: none; }
-    .search-modal__tag:hover { border-color: rgba(var(--color-brand-rgb), 0.35); color: var(--color-brand); background: rgba(var(--color-brand-rgb), 0.06); transform: translateY(-1px); }
     .search-modal__tag:active { transform: scale(0.94); }
     .search-modal__tag, .search-modal__result, .search-modal__submit, .search-modal__clear, .search-modal__section-action { -webkit-tap-highlight-color: transparent !important; }
 
@@ -333,7 +339,6 @@
     .search-modal__results .search-modal__result:nth-child(4) { animation-delay: .15s; }
     .search-modal__results .search-modal__result:nth-child(5) { animation-delay: .2s; }
     .search-modal__result::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; background: linear-gradient(180deg, var(--color-brand), var(--color-brand-hover)); border-radius: 0 2px 2px 0; opacity: 0; transition: opacity 0.2s; }
-    .search-modal__result:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 16px 40px rgba(0,0,0,0.09); border-color: rgba(var(--color-brand-rgb), 0.4); }
     .search-modal__result:active { transform: scale(0.97); transition-duration: .1s; }
     .search-modal__result-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .search-modal__result-excerpt { font-size: 13px; color: var(--color-text-secondary); margin-top: 8px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -598,6 +603,46 @@
            详情页仍由服务端完整渲染，PJAX 只替换 main，返回列表不再整页刷新。 */
         (function(){
           var currentRequest = null;
+          /* 已访问列表保留其真实 DOM（含动态卡片与事件绑定）。
+             返回时直接换回，而非重新请求后先显示骨架再校正滚动，避免深处卡片返回时闪一下。 */
+          var pageCache = Object.create(null);
+          function currentPjaxStyles(){
+            return Array.prototype.map.call(document.querySelectorAll('style[data-aiym-pjax-style]'), function(s){ return s.textContent || ''; });
+          }
+          function restorePjaxStyles(styles){
+            document.querySelectorAll('style[data-aiym-pjax-style]').forEach(function(s){ s.remove(); });
+            (styles || []).forEach(function(text){
+              var style = document.createElement('style');
+              style.setAttribute('data-aiym-pjax-style','');
+              style.textContent = text;
+              document.head.appendChild(style);
+            });
+          }
+          function cacheCurrentPage(url, main){
+            if (!url || !main) return;
+            pageCache[url] = { main: main, title: document.title, styles: currentPjaxStyles() };
+          }
+          function restoreCachedPage(url, scrollY, horizontal){
+            var cached = pageCache[url];
+            var current = document.querySelector('main#main-content');
+            if (!cached || !cached.main || !current || !current.parentNode) return false;
+            if (currentRequest) { currentRequest.abort(); currentRequest = null; }
+            /* 返回帧没有任何旧 :active 缩放；换回完整列表 DOM 后一次性定位，不做轮询纠正。 */
+            var root = document.documentElement;
+            root.classList.add('bfr');
+            restorePjaxStyles(cached.styles);
+            document.title = cached.title;
+            current.parentNode.replaceChild(cached.main, current);
+            jumpTo(typeof scrollY === 'number' ? scrollY : 0);
+            if (horizontal) {
+              document.querySelectorAll('.hot-scroll, .res-hot-scroll').forEach(function(el, i){
+                var x = Number(horizontal[i]);
+                if (isFinite(x)) el.scrollLeft = x;
+              });
+            }
+            requestAnimationFrame(function(){ setTimeout(function(){ root.classList.remove('bfr'); }, 80); });
+            return true;
+          }
           function sameOrigin(url){ return url.origin === location.origin; }
           function eligible(link, e){
             if (!link || !link.matches('[data-pjax]') || e.defaultPrevented || e.button !== 0) return false;
@@ -666,8 +711,9 @@
             if (currentRequest) currentRequest.abort();
             currentRequest = new AbortController();
             /* 请求期间不改变列表滚动位置；main 替换完成后，详情页一次性置顶，
-               返回列表则恢复历史状态中的原滚动位置。 */
-            document.body.setAttribute('aria-busy','true');
+               返回列表则恢复历史状态中的原滚动位置。
+               不给 body 设置 aria-busy：通用样式会将 [aria-busy=true] 整页降至 .7 透明度，
+               视觉上形成全页蒙层。 */
             return fetch(url, {credentials:'same-origin', signal:currentRequest.signal, headers:{'X-Requested-With':'pjax'}})
               .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
               .then(function(html){
@@ -675,11 +721,14 @@
                 var next = doc.querySelector('main#main-content');
                 var main = document.querySelector('main#main-content');
                 if (!next || !main) throw new Error('PJAX main not found');
+                /* 前进时保留当前真实列表 DOM；返回可原样换回，避免动态列表重新拉取闪烁。 */
+                if (push) cacheCurrentPage(location.href, main);
                 if (push) history.pushState({aiymPjax:true, scrollY:0, returnScroll:typeof returnScroll === 'number' ? returnScroll : 0, returnUrl:location.href}, '', url);
                 refreshHead(doc);
                 document.title = doc.title;
-                main.innerHTML = next.innerHTML;
-                main.className = next.className;
+                var replacement = document.importNode(next, true);
+                main.parentNode.replaceChild(replacement, main);
+                main = replacement;
                 /* main 容器复用，但内容已换页；允许前进详情播放一次进入效果。 */
                 delete main.dataset.aiymMaterialized;
                 runScripts(main);
@@ -727,12 +776,10 @@
                   })();
                   restoreHorizontalScroll(returnHorizontal);
                 }
-                document.body.removeAttribute('aria-busy');
                 currentRequest = null;
               })
               .catch(function(err){
                 if (err.name !== 'AbortError') window.location.href = url;
-                document.body.removeAttribute('aria-busy');
               });
           }
           document.addEventListener('click', function(e){
@@ -762,6 +809,7 @@
                 if (savedHorizontal) restoreHorizontal = JSON.parse(savedHorizontal);
               }
             } catch (_) {}
+            if (restoreCachedPage(location.href, restore, restoreHorizontal)) return;
             load(location.href, false, restore, 0, restoreHorizontal);
           });
           window.addEventListener('pagehide', function(){

@@ -272,10 +272,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     <span th:text="${post.stats?.comment ?: 0}">0</span>
                 </span>
-                <button class="post-share-btn" data-post-share type="button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                    <span>分享</span>
-                </button>
+                <th:block th:replace="~{modules/share :: share}"></th:block>
             </div>
 
             <!-- 下载信息（资源文章，JS 控制显隐） -->
@@ -359,38 +356,6 @@
 
     <script>
     (function() {
-        /* 分享按钮 - 复制链接+标题+引用 */
-        var shareBtn = document.querySelector('[data-post-share]');
-        if (shareBtn) {
-            shareBtn.addEventListener('click', function() {
-                var url = location.href;
-                var title = document.querySelector('.post-title-page')?.textContent || document.title;
-                var siteName = '[[${site.title}]]';
-                var siteDesc = '[[${site.subtitle ?: "创意 · 技术 · 分享"}]]';
-                var shareText = '📢 发现一篇好文，值得一看👇\n\n📌 ' + title + '\n🔗 ' + url + '\n\n—— 来自「' + siteName + '」✨\n🌐 ' + location.hostname + ' · ' + siteDesc;
-
-                /* 统一健壮复制：http 内网下 navigator.clipboard 不可用，走 execCommand */
-                function doCopy(text, ok, fail) {
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(text).then(ok).catch(function(){ fallback(); });
-                    } else { fallback(); }
-                    function fallback(){ try {
-                        var t = document.createElement('textarea');
-                        t.value = text; t.style.position = 'fixed'; t.style.opacity = '0';
-                        document.body.appendChild(t); t.focus(); t.select();
-                        var done = document.execCommand('copy');
-                        document.body.removeChild(t);
-                        done ? ok() : fail && ok();
-                    } catch(e){ ok && ok(); } }
-                }
-                doCopy(shareText, function(){}, function(){});
-                /* 立即给反馈 */
-                var span = shareBtn.querySelector('span');
-                span.textContent = '已复制';
-                shareBtn.classList.add('is-copied');
-                setTimeout(function() { span.textContent = '分享'; shareBtn.classList.remove('is-copied'); }, 2000);
-            });
-        }
 
         /* 正文复制自动追加引用 */
         document.addEventListener('copy', function(e) {

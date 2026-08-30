@@ -132,6 +132,7 @@ function toolStats(text){if(!text)return'';return text.split('\n').length+' 行 
             <h1 class="page-title" th:text="${singlePage.spec.title}">工具标题</h1>
             <p class="page-desc" th:if="${singlePage.spec.excerpt?.raw != null and singlePage.spec.excerpt?.raw != ''}"
                th:text="${singlePage.spec.excerpt?.raw}">工具简介</p>
+            <div style="margin-top:12px"><th:block th:replace="~{modules/share :: share}"></th:block></div>
         </header>
         <div th:utext="${singlePage.content?.content}">
         </div>
