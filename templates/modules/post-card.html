@@ -4,7 +4,7 @@
 <!-- 文章卡片 - 有封面 -->
 <div th:fragment="post-card(post)" class="post-card"
      th:with="cover = ${post.spec.cover ?: '/assets/default-cover.png'}">
-    <a th:href="@{${post.status?.permalink}}" class="post-card__link">
+    <a th:href="@{${post.status?.permalink}}" class="post-card__link" data-pjax>
         <div class="post-card__cover" th:if="${post.spec.cover}">
             <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" loading="lazy">
         </div>

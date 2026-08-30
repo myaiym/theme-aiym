@@ -8,9 +8,9 @@
     /* 覆盖 style.css 的 miniapp 卡片包裹样式 */
     .post-content { background: none !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
-    /* 桌面端三栏布局：TOC | 内容 */
-    .post-layout { max-width: 1100px; margin: 0 auto; padding: 8px 0 48px; display: flex; gap: 32px; }
-    @media (min-width: 768px) { .post-layout { padding: 32px 32px 64px; } }
+    /* 桌面端三栏布局：跟随全局流式容器，避免第二层固定 1100px 宽度。 */
+    .post-layout { width: 100%; max-width: none; margin: 0; padding: 8px 0 48px; display: flex; gap: 32px; }
+    @media (min-width: 768px) { .post-layout { padding: 32px 0 64px; } }
     @media (max-width: 1023px) { .post-layout { flex-direction: column; } }
 
     .post-main { flex: 1; min-width: 0; background: var(--color-bg-secondary); border-radius: 14px; padding: 16px; border: 1px solid var(--color-border-primary); box-sizing: border-box; }
@@ -21,22 +21,64 @@
     .post-meta-simple { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--color-text-muted); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border-primary); }
     .post-meta-simple span { display: inline-flex; align-items: center; gap: 4px; }
     .post-share-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--color-border-primary); background: var(--color-bg-secondary); color: var(--color-text-muted); font-size: 12px; cursor: pointer; transition: all 0.2s; }
-    .post-share-btn:hover { color: var(--color-brand); border-color: var(--color-brand); }
+    @media (hover: hover) and (pointer: fine) { .post-share-btn:hover { color: var(--color-brand); border-color: var(--color-brand); } }
     .post-share-btn.is-copied { color: var(--color-success); border-color: var(--color-success); }
     .post-content { font-size: 16px; line-height: 1.8; }
+    /* 主卡片可随桌面扩展，正文行宽保持阅读舒适度。 */
+    @media (min-width: 1024px) {
+        /* 资源信息与操作区保持流式；连续阅读内容收在舒适行宽内。 */
+        .post-content, .resource-supplement { max-width: 780px; }
+    }
+
+    .post-content .code-block { position: relative; margin: 18px 0; }
+    .post-content .code-block pre { margin: 0; }
+    .post-content .code-copy-btn {
+        display: inline-flex; align-items: center; gap: 5px; min-height: 32px;
+        touch-action: manipulation;
+    }
+    .post-content .code-copy-btn svg { flex: 0 0 auto; }
+
+    /* 图片预览：关闭键固定在视口右上，任何长图/竖图都不会被图片容器推到可视区外。 */
+    .image-preview-close {
+        position: fixed !important; top: max(16px, env(safe-area-inset-top, 0px)) !important; right: 16px !important;
+        width: 44px !important; height: 44px !important; display: flex !important;
+        align-items: center; justify-content: center; padding: 0 !important;
+        color: #fff !important; background: rgba(20, 22, 28, .78) !important;
+        border: 1px solid rgba(255, 255, 255, .30) !important; border-radius: 50% !important;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, .34); opacity: 1 !important; z-index: 10001 !important;
+        touch-action: manipulation;
+    }
+    .image-preview-close svg { display: block !important; width: 20px !important; height: 20px !important; flex: 0 0 auto; }
+    .image-preview-close svg path { display: block !important; stroke: currentColor !important; }
+    @media (hover: hover) and (pointer: fine) { .image-preview-close:hover { background: var(--color-brand) !important; border-color: var(--color-brand) !important; } }
 
     /* 上下篇 - miniapp 风格 */
     .post-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 48px 0 0; }
     .post-nav__item { display: flex; flex-direction: column; gap: 6px; padding: 16px; background: var(--color-bg-secondary); border-radius: 12px; text-decoration: none; border: 1px solid var(--color-border-primary); transition: all 0.25s; }
-    .post-nav__item:hover { border-color: var(--color-brand); box-shadow: 0 4px 16px rgba(var(--color-brand-rgb), 0.1); transform: translateY(-2px); }
+    @media (hover: hover) and (pointer: fine) { .post-nav__item:hover { border-color: var(--color-brand); box-shadow: 0 4px 16px rgba(var(--color-brand-rgb), 0.1); transform: translateY(-2px); } }
     .post-nav__item--next { text-align: right; align-items: flex-end; }
     .post-nav__label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--color-text-muted); font-weight: 500; }
     .post-nav__item--next .post-nav__label { flex-direction: row-reverse; }
     .post-nav__label svg { width: 14px; height: 14px; }
     .post-nav__title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .post-nav__item:hover .post-nav__title { color: var(--color-brand); }
+    @media (hover: hover) and (pointer: fine) { .post-nav__item:hover .post-nav__title { color: var(--color-brand); } }
     .post-nav__link { font-size: 13px; color: var(--color-brand); font-weight: 500; margin-top: 4px; }
-    .post-nav__item:hover .post-nav__link { text-decoration: underline; }
+    .post-nav--single { grid-template-columns: minmax(0, 1fr); }
+    @media (hover: hover) and (pointer: fine) { .post-nav__item:hover .post-nav__link { text-decoration: underline; } }
+    @media (max-width: 480px) {
+        /* 窄屏保留标题和方向，去掉重复的“查看全文”行，避免双栏卡片过高。 */
+        .post-nav__link { display: none; }
+    }
+
+    /* Halo 编辑器会将图片尺寸写入 width="50%" 等属性；全局文章样式此前用 width:auto!important 覆盖了它。
+       这里保留编辑器设置的尺寸、比例和父段落的对齐方式，只限制图片不超出正文。 */
+    .post-content img {
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+        display: inline-block !important;
+        vertical-align: top;
+    }
 
     /* 评论区 */
     .comment-section { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--color-border-primary); }
@@ -74,7 +116,7 @@
             transition: all 0.15s;
             line-height: 1.5;
         }
-        .post-toc-sidebar .post-toc-link:hover { color: var(--color-brand); }
+        @media (hover: hover) and (pointer: fine) { .post-toc-sidebar .post-toc-link:hover { color: var(--color-brand); } }
         .post-toc-sidebar .post-toc-link--sub { padding-left: 24px; font-size: 12px; }
         .post-toc-sidebar .post-toc-link--active { color: var(--color-brand); border-left-color: var(--color-brand); font-weight: 600; }
     }
@@ -93,7 +135,7 @@
             align-items: center; justify-content: center;
             cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s;
         }
-        .post-toc-fab:hover { background: var(--color-brand); color: #fff; border-color: var(--color-brand); }
+        @media (hover: hover) and (pointer: fine) { .post-toc-fab:hover { background: var(--color-brand); color: #fff; border-color: var(--color-brand); } }
         .back-to-top { bottom: 142px !important; right: 12px !important; }
     }
 
@@ -136,10 +178,10 @@
     .resource-download-info__icon img { width: 100%; height: 100%; object-fit: cover; }
     .resource-download-info__actions { display: flex; gap: 10px; padding: 12px 16px 16px; }
     .resource-download-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px; border-radius: 12px; background: var(--color-brand); color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; transition: background 0.2s; }
-    .resource-download-btn:hover { background: var(--color-brand-hover); }
+    @media (hover: hover) and (pointer: fine) { .resource-download-btn:hover { background: var(--color-brand-hover); } }
     .resource-download-disabled { flex: 1; text-align: center; padding: 12px; border-radius: 12px; background: var(--color-bg-tertiary); color: var(--color-text-muted); font-size: 13px; }
     .resource-copy-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 12px; border-radius: 12px; border: 1px solid var(--color-border-primary); background: var(--color-bg-secondary); color: var(--color-text-secondary); font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: inherit; }
-    .resource-copy-btn:hover { border-color: var(--color-brand); color: var(--color-brand); }
+    @media (hover: hover) and (pointer: fine) { .resource-copy-btn:hover { border-color: var(--color-brand); color: var(--color-brand); } }
     .resource-copy-btn.copied { border-color: var(--color-success); color: var(--color-success); }
 
     /* === 补充说明 === */
@@ -206,12 +248,14 @@
         <div class="post-main">
 
             <!-- 封面图（资源文章，JS 控制显隐） -->
-            <div id="resource-hero-section" class="resource-hero-full" style="display:none" th:if="${post.spec.cover}">
+            <div id="resource-hero-section" class="resource-hero-full" style="display:none"
+                 th:if="${post.spec.cover != null and post.spec.cover != ''}">
                 <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" class="resource-hero-full__img" loading="lazy">
             </div>
 
-            <!-- 文章封面图（所有文章，JS 检测图片加载后决定是否显示） -->
-            <div class="post-cover" style="display:none">
+            <!-- 文章封面图（只有存在封面时输出，避免空 src 被浏览器解析为当前详情页请求） -->
+            <div class="post-cover" style="display:none"
+                 th:if="${post.spec.cover != null and post.spec.cover != ''}">
                 <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" class="post-cover__img" loading="lazy" data-cover-img>
             </div>
 
@@ -389,15 +433,26 @@
                     if (!prev && !next) { navEl.remove(); return; }
                     var L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>';
                     var R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>';
-                    var h = '<nav class="post-nav">';
-                    if (prev) h += '<a href="' + (prev.status?.permalink||'#') + '" class="post-nav__item"><span class="post-nav__label">' + L + ' 上一篇</span><span class="post-nav__title">' + (prev.spec?.title||'') + '</span><span class="post-nav__link">查看全文 →</span></a>';
-                    if (next) h += '<a href="' + (next.status?.permalink||'#') + '" class="post-nav__item post-nav__item--next"><span class="post-nav__label">下一篇 ' + R + '</span><span class="post-nav__title">' + (next.spec?.title||'') + '</span><span class="post-nav__link">← 查看全文</span></a>';
+                    var h = '<nav class="post-nav' + ((prev && next) ? '' : ' post-nav--single') + '">';
+                    if (prev) h += '<a href="' + (prev.status?.permalink||'#') + '" class="post-nav__item" data-pjax><span class="post-nav__label">' + L + ' 上一篇</span><span class="post-nav__title">' + (prev.spec?.title||'') + '</span><span class="post-nav__link">查看全文 →</span></a>';
+                    if (next) h += '<a href="' + (next.status?.permalink||'#') + '" class="post-nav__item post-nav__item--next" data-pjax><span class="post-nav__label">下一篇 ' + R + '</span><span class="post-nav__title">' + (next.spec?.title||'') + '</span><span class="post-nav__link">← 查看全文</span></a>';
                     h += '</nav>';
                     navEl.outerHTML = h;
                 }).catch(function() { navEl.remove(); });
         }
 
+        /* Halo 编辑器以 width="50%" 记录比例；该属性不是浏览器标准的百分比宽度写法，
+           需转成行内样式才能准确还原后台所设尺寸。段落自身的 text-align 不改，继续承担左/中/右对齐。 */
+        function restoreEditorImageSizing(root) {
+            if (!root) return;
+            root.querySelectorAll('img[width]').forEach(function(img) {
+                var width = (img.getAttribute('width') || '').trim();
+                if (/^(?:0|[1-9]\d?)(?:\.\d+)?%$/.test(width)) img.style.setProperty('width', width, 'important');
+            });
+        }
+
         var content = document.querySelector('[data-post-content]');
+        restoreEditorImageSizing(content);
         if (!content) return;
 
         var headings = content.querySelectorAll('h2, h3');

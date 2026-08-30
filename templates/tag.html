@@ -11,7 +11,7 @@
 
         <div class="tag-posts-grid">
             <div th:each="post : ${posts.items}" class="post-card">
-                <a th:href="@{${post.status?.permalink}}" class="post-card__link">
+                <a th:href="@{${post.status?.permalink}}" class="post-card__link" data-pjax>
                     <div class="post-card__cover" th:if="${post.spec.cover}">
                         <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" loading="lazy">
                     </div>

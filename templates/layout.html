@@ -28,9 +28,11 @@
        ============================ */
 
     /* 页头 */
-    .site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(250,248,245,0.88); backdrop-filter: blur(24px) saturate(145%); -webkit-backdrop-filter: blur(24px) saturate(145%); box-shadow: 0 8px 28px rgba(26,23,20,0.04); }
-    [data-theme="dark"] .site-header { background: rgba(18,18,18,0.88); }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1440px; margin: 0 auto; height: 56px; padding: 0 48px; box-sizing: border-box; }
+    .site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; overflow: hidden; isolation: isolate; background: rgba(250,248,245,0.80); border-bottom: 1px solid rgba(255,255,255,0.60); backdrop-filter: blur(28px) saturate(155%); -webkit-backdrop-filter: blur(28px) saturate(155%); box-shadow: 0 8px 28px rgba(26,23,20,0.04), inset 0 1px 0 rgba(255,255,255,.72); }
+    .site-header::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(105deg, rgba(255,255,255,.32), transparent 34%, rgba(255,255,255,.10) 68%, rgba(255,255,255,.24)); }
+    [data-theme="dark"] .site-header { background: rgba(18,18,18,0.80); border-bottom-color: rgba(255,255,255,.10); box-shadow: 0 8px 28px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.12); }
+    [data-theme="dark"] .site-header::before { background: linear-gradient(105deg, rgba(255,255,255,.10), transparent 34%, rgba(255,255,255,.04) 68%, rgba(255,255,255,.08)); }
+    .header-inner { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; width: 100%; max-width: 1520px; margin: 0 auto; height: 56px; padding: 0 clamp(20px, 4vw, 64px); box-sizing: border-box; }
 
     /* 导航栏 */
     .header-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -40,18 +42,19 @@
     .header-logo__text { display: flex; flex-direction: column; }
     .header-logo__title { font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.2; }
     .header-logo__sub { font-size: 9px; font-weight: 700; color: var(--color-text-muted); letter-spacing: 2px; text-transform: uppercase; }
-    .header-tabbar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-    .tabbar-track { display: flex; align-items: center; padding: 4px; border-radius: 16px; background: rgba(0,0,0,0.03); }
-    .tabbar-item { display: flex; align-items: center; gap: 5px; padding: 7px 30px; border-radius: 12px; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: all 0.25s; }
-    .tabbar-item:hover { color: var(--color-text-primary); background: rgba(0,0,0,0.04); }
-    .tabbar-item.active { color: #fff; background: var(--color-brand); }
+    .header-tabbar { grid-column: 2; min-width: 0; }
+    .tabbar-track { display: flex; align-items: center; padding: 3px; border-radius: 16px; border: 1px solid rgba(255,255,255,.48); background: rgba(255,255,255,.28); box-shadow: inset 0 1px 0 rgba(255,255,255,.56), 0 1px 2px rgba(26,23,20,.04); }
+    /* 桌面端菜单轨道适度加宽，避免居中菜单两侧视觉留白过大；中小桌面由下方断点收缩。 */
+    .tabbar-item { display: flex; align-items: center; gap: 5px; padding: 7px clamp(18px, 2.4vw, 36px); border-radius: 12px; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: color .2s ease, background-color .2s ease, box-shadow .2s ease; white-space: nowrap; }
+    .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,.34); }
+    .tabbar-item.active { color: var(--color-brand-text); background: rgba(255,255,255,.62); box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 1px 3px rgba(26,23,20,.07); }
     .tabbar-item .iconify { transition: transform 0.3s; display: inline-flex; align-items: center; overflow: visible; flex-shrink: 0; width: 1.15em; height: 1.15em; margin: 0 -0.07em; }
     .tabbar-item .iconify svg { width: 100%; height: 100%; }
     .tabbar-item:hover .iconify { transform: scale(1.15); }
-    [data-theme="dark"] .tabbar-track { background: rgba(255,255,255,0.05); }
+    [data-theme="dark"] .tabbar-track { border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.06); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 1px 2px rgba(0,0,0,.12); }
     [data-theme="dark"] .tabbar-item { color: var(--color-text-muted); }
-    [data-theme="dark"] .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,0.06); }
-    [data-theme="dark"] .tabbar-item.active { color: #fff; background: var(--color-brand); }
+    [data-theme="dark"] .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,.10); }
+    [data-theme="dark"] .tabbar-item.active { color: var(--color-brand-text); background: rgba(255,255,255,.15); box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 1px 3px rgba(0,0,0,.14); }
 
     /* 菜单动画 */
     .animated-hover .iconify { display: inline-block; }
@@ -61,12 +64,33 @@
     @keyframes faa-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
     /* 右侧区域 */
-    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-right { grid-column: 3; justify-self: end; display: flex; align-items: center; gap: clamp(8px, 1.2vw, 16px); min-width: 0; }
     .header-greeting { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
     .header-greeting__text { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: 0.5px; white-space: nowrap; }
     .header-greeting__stats { font-size: 11px; color: var(--color-text-muted); white-space: nowrap; }
     [data-theme="dark"] .header-greeting { color: var(--color-text-muted); }
     [data-theme="dark"] .header-greeting strong { color: var(--color-text-primary); }
+
+    /* 中小桌面：菜单与两侧操作按可用空间收缩，避免绝对居中时相互遮挡。 */
+    @media (min-width: 768px) and (max-width: 1100px) {
+        .header-inner { padding-inline: clamp(16px, 2.5vw, 28px); }
+        .header-greeting { display: none; }
+        .header-logo__sub { display: none; }
+        .tabbar-item { gap: 4px; padding-inline: clamp(10px, 1.5vw, 16px); font-size: 12px; }
+        .header-right { gap: 8px; }
+        .header-user__trigger { padding-right: 8px; }
+        .header-user__text { display: none; }
+    }
+    @media (min-width: 768px) and (max-width: 860px) {
+        .header-logo__text { display: none; }
+        .tabbar-item { padding-inline: 9px; }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+        .site-header { background: var(--color-bg-primary); backdrop-filter: none; -webkit-backdrop-filter: none; }
+        .site-header::before { display: none; }
+        .tabbar-track { background: var(--color-bg-tertiary); }
+        .tabbar-item.active { background: var(--color-bg-secondary); }
+    }
 
     /* 操作按钮 */
     .header-action-btn { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: var(--color-text-secondary); border-radius: 8px; transition: all 0.2s; background: none; border: none; cursor: pointer; }
@@ -115,6 +139,8 @@
 
     /* 移动端头部 */
     .mobile-header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 16px; background: rgba(250,248,245,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    /* 某些 Halo/Thymeleaf 缓存版本会重复输出移动头部；只保留第一个，避免两个 fixed header 叠加。 */
+    body > .mobile-header ~ .mobile-header { display: none !important; }
     [data-theme="dark"] .mobile-header { background: rgba(18,18,18,0.92); }
     .mobile-header__left { display: flex; align-items: center; }
     .mobile-header__logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
@@ -147,8 +173,10 @@
     .aiym-footer__slogan { font-size: 11px; color: var(--color-text-muted); letter-spacing: 2px; margin: 0; }
     .aiym-footer__copy { font-size: 11px; color: var(--color-text-muted); margin: 0; }
     .aiym-footer__icp { font-size: 11px; color: var(--color-text-muted); margin: 0; }
-    .aiym-footer__icp a { color: var(--color-text-muted); text-decoration: none; }
-    .aiym-footer__icp a:hover { color: var(--color-brand); }
+    /* 备案号 <a> 无 class，会被全局 a:not([class]) 套上蓝色下划线；此处必须用 !important 强压成与其他页脚文字一致 */
+    .aiym-footer__icp a { color: inherit !important; text-decoration: none !important; }
+    .aiym-footer__icp a:link, .aiym-footer__icp a:visited, .aiym-footer__icp a:hover, .aiym-footer__icp a:active { color: inherit !important; text-decoration: none !important; }
+    .aiym-footer__icp a:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; border-radius: 2px; }
     .aiym-footer__police { margin: 0; }
     @media (max-width: 767px) {
         footer.site-footer.aiym-footer, .site-footer.aiym-footer {
@@ -162,25 +190,58 @@
         }
     }
     @media (min-width: 768px) {
-        footer.site-footer.aiym-footer, .site-footer.aiym-footer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; padding: 12px 24px 10px !important; background: rgba(250,248,245,0.88) !important; box-shadow: 0 -8px 28px rgba(26,23,20,0.04) !important; backdrop-filter: blur(24px) saturate(145%); -webkit-backdrop-filter: blur(24px) saturate(145%); }
-        [data-theme="dark"] footer.site-footer.aiym-footer, [data-theme="dark"] .site-footer.aiym-footer { background: rgba(18,18,18,0.88) !important; box-shadow: 0 -8px 28px rgba(0,0,0,0.12) !important; }
-        .site-content { padding-bottom: 100px; }
+        /* 短页面由内容区补足视口高度，长页面仍按正文自然撑开：页脚只在短页贴底。 */
+        html, body { min-height: 100%; }
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        /* 允许短页内容区吸收剩余空间，同时在页脚高度较大时收缩，避免多出一段可滚动空白。 */
+        .site-content { flex: 1 1 auto; min-height: 0; }
+        /* 桌面端也按移动端的纵向信息层级展示，页脚随正文自然出现。 */
+        footer.site-footer.aiym-footer, .site-footer.aiym-footer { position: static; margin-top: 0; padding: 18px 24px 12px !important; }
+        .aiym-footer__line { display: block; }
+        .aiym-footer__content { flex-direction: column; align-items: center; gap: 2px; }
+        .aiym-footer__brand-row { margin-bottom: 2px; }
+    }
+
+    @media (max-width: 767px) {
+        /* 移动端固定头部必须完全遮住下面滚动内容；透明背景会让返回 PJAX 后的卡片颜色透出来。 */
+        .mobile-header { height: 50px; background: var(--color-bg-primary) !important; opacity: 1; }
+        [data-theme="dark"] .mobile-header { background: var(--color-bg-primary) !important; }
+        /* 头部实际高度为 50px，内容起始位也必须严格对齐，不能留下 2~6px 的透视缝隙。 */
+        .site-content { padding-top: 50px !important; }
+        .category-filter { top: 50px !important; background: var(--color-bg-primary) !important; opacity: 1; }
     }
 
     /* 内容区 */
     .site-content { padding-top: 56px; }
     /* ⚠️ 白色背景只在 post.html 的 .post-main 加，不要加在全局 .container 上 */
-    /* 桌面端容器宽度统一 1200px（style.css .container 在 1536px+ 会到 1400px，需覆盖） */
-    @media (min-width: 1280px) { .site-content > .container { max-width: 1200px; } }
+    /* 全局流式内容容器：最大内容宽 1200px，中小桌面不再跳回 720px 固定档。 */
+    .site-content > .container { width: 100%; max-width: 1280px; margin: 0 auto; padding-inline: clamp(20px, 3vw, 40px); box-sizing: border-box; }
     .page-content { max-width: 1200px; margin: 0 auto; padding: 0 12px; box-sizing: border-box; }
-    @media (min-width: 768px) { .page-content { padding: 0 24px; } }
+    @media (min-width: 768px) { .page-content { padding: 0; } }
     @media (max-width: 767px) { .page-content { padding: 0; } }
-    .home { max-width: 1200px; margin: 0 auto; padding: 0 32px; box-sizing: border-box; }
+    /* 三个聚合页（首页/资源/工具箱）直接使用外层流式容器；移动端仍由各页自身规则控制。 */
+    .home { width: 100%; max-width: none; margin: 0; padding: 0; box-sizing: border-box; }
     /* 分类筛选基础样式（防 FOUC，详细样式在 index.html） */
-    .category-filter { overflow-x: auto; scrollbar-width: none; position: sticky; top: 56px; z-index: 90; padding: 8px 0 !important; margin: 0; background: var(--color-bg-primary); text-align: left; }
+    .category-filter { overflow-x: auto; scrollbar-width: none; position: sticky; top: 56px; z-index: 90; padding: 0 !important; margin: 0; background: var(--color-bg-primary); text-align: left; }
     .category-scroll { display: flex; gap: 8px; padding: 0; white-space: nowrap; justify-content: flex-start; text-align: left; }
     .category-pill { display: inline-flex; align-items: center; gap: 4px; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); cursor: pointer; transition: all 0.2s ease; font-family: inherit; }
     .category-pill--active { background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover)); color: var(--color-text-inverse); border-color: transparent; font-weight: 600; }
+
+    /* 首次进入的轻量 materialize：只动 opacity/transform，不碰布局或滚动位置。
+       返回列表由 PJAX/bfcache 直接恢复，明确不套此效果，避免用户感到列表重新加载。 */
+    @keyframes aiym-materialize-in {
+        from { opacity: 0; transform: translateY(10px) scale(.985); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .aiym-enter-item {
+        animation: aiym-materialize-in 420ms cubic-bezier(.22, 1, .36, 1) both;
+        animation-delay: var(--aiym-enter-delay, 0ms);
+        will-change: transform, opacity;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        @keyframes aiym-materialize-in { from { opacity: 0; } to { opacity: 1; } }
+        .aiym-enter-item { animation-duration: 180ms; }
+    }
 
     /* 返回顶部按钮（全局共享） */
     .back-to-top {
@@ -202,7 +263,7 @@
 
     </style>
 
-    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version + '-apple4'})}">
+    <link rel="stylesheet" th:href="@{/assets/css/style.css?v={v}(v=${theme.spec.version + '-article-code2'})}">
 
     <!-- 搜索弹窗样式（必须在 style.css 之后，确保覆盖） -->
     <style>
@@ -350,8 +411,7 @@
 <body th:classappend="${theme.config.appearance?.defaultMode == 'dark' ? 'theme-dark' : ''}">
     <a href="#main-content" class="skip-link">跳到主要内容</a>
 
-    <header th:replace="~{modules/header :: header}"></header>
-    <header th:replace="~{modules/header :: mobile-header}"></header>
+    <th:block th:replace="~{modules/header :: header}"></th:block>
 
     <main id="main-content" class="site-content" role="main">
         <div class="container">
@@ -435,7 +495,7 @@
          th:attr="data-cover-gallery=${theme.config.appearance?.coverGallery ?: '[]'},
                   data-default-cover=${theme.config.basic?.defaultCover ?: ''}"></div>
 
-    <script th:src="@{/assets/js/main.js?v=1.0.5-apple3}" defer></script>
+    <script th:src="@{/assets/js/main.js?v=1.0.8-preview-close}" defer></script>
         <script>
         (function () {
           /* 返回不刷新、保持原样：
@@ -498,6 +558,214 @@
                 })();
               } catch(e){}
             }
+          });
+        })();
+        /* ===== 页面首次 materialize（聚合/详情内容） =====
+           只用于全新进入或前进到详情：回退列表与 bfcache 恢复均不播放，绝不干扰现有滚动恢复链路。 */
+        (function(){
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          var selector = [
+            '.home > .category-filter', '.home > .hot-section', '.home > .article-section',
+            '.resources-page > .res-hero', '.resources-page > .res-filter', '.resources-page > .res-section',
+            '.post-layout > .post-main', '.post-layout > .post-toc-sidebar',
+            '.tool-detail-page > *'
+          ].join(',');
+          function materialize(root){
+            if (reduce || !root || root.dataset.aiymMaterialized === '1') return;
+            var items = Array.prototype.slice.call(root.querySelectorAll(selector));
+            if (!items.length) return;
+            root.dataset.aiymMaterialized = '1';
+            items.forEach(function(el, i){
+              el.style.setProperty('--aiym-enter-delay', Math.min(i * 36, 144) + 'ms');
+              el.classList.add('aiym-enter-item');
+              el.addEventListener('animationend', function(){
+                el.classList.remove('aiym-enter-item');
+                el.style.removeProperty('--aiym-enter-delay');
+              }, {once:true});
+            });
+          }
+          window.AIYMPageEnter = materialize;
+          window.addEventListener('pageshow', function(ev){
+            if (ev.persisted) return; /* bfcache：保持用户离开时的原样 */
+            var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+            if (nav && nav.type === 'back_forward') return; /* 硬返回也只恢复滚动，不重演 */
+            requestAnimationFrame(function(){ materialize(document.querySelector('main#main-content')); });
+          });
+        })();
+
+        /* ===== 轻量 PJAX：列表卡片与详情页共用 =====
+           只接管明确标记 data-pjax 的同源卡片；普通导航、外链、表单不受影响。
+           详情页仍由服务端完整渲染，PJAX 只替换 main，返回列表不再整页刷新。 */
+        (function(){
+          var currentRequest = null;
+          function sameOrigin(url){ return url.origin === location.origin; }
+          function eligible(link, e){
+            if (!link || !link.matches('[data-pjax]') || e.defaultPrevented || e.button !== 0) return false;
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || link.target === '_blank' || link.hasAttribute('download')) return false;
+            var url; try { url = new URL(link.href, location.href); } catch (_) { return false; }
+            return sameOrigin(url) && url.hash === '';
+          }
+          function runScripts(root){
+            root.querySelectorAll('script').forEach(function(old){
+              var s = document.createElement('script');
+              for (var i=0;i<old.attributes.length;i++) s.setAttribute(old.attributes[i].name, old.attributes[i].value);
+              s.text = old.textContent;
+              old.parentNode.replaceChild(s, old);
+            });
+          }
+          function refreshHead(doc){
+            document.querySelectorAll('style[data-aiym-pjax-style]').forEach(function(s){s.remove();});
+            doc.head.querySelectorAll('style').forEach(function(style){
+              var text = style.textContent || '';
+              /* layout.html 的共享样式已经存在，只搬运文章/工具详情页的专属 head 样式。 */
+              if (!/\.tool-|\.post-|\.json-|\.qr-/.test(text)) return;
+              var copy = document.createElement('style'); copy.setAttribute('data-aiym-pjax-style',''); copy.textContent = text;
+              document.head.appendChild(copy);
+            });
+          }
+          function jumpTo(y){
+            var root = document.documentElement;
+            var old = root.style.scrollBehavior;
+            root.style.scrollBehavior = 'auto';
+            window.scrollTo({top:y, left:0, behavior:'auto'});
+            root.scrollTop = y;
+            document.body.scrollTop = y;
+            root.style.scrollBehavior = old;
+          }
+          /* 横向推荐区不属于 window 滚动容器，PJAX 替换 main 后必须单独保存/恢复。 */
+          function horizontalScroll(){
+            var out = {};
+            document.querySelectorAll('.hot-scroll, .res-hot-scroll').forEach(function(el, i){
+              out[i] = el.scrollLeft || 0;
+            });
+            return out;
+          }
+          function restoreHorizontalScroll(values){
+            if (!values) return;
+            function apply(){
+              document.querySelectorAll('.hot-scroll, .res-hot-scroll').forEach(function(el, i){
+                var x = Number(values[i]);
+                if (!isFinite(x)) return;
+                el.scrollLeft = x;
+              });
+            }
+            apply();
+            /* 推荐区脚本可能异步替换自身节点；监听这段短窗口，等新节点出现后立即恢复。 */
+            var root = document.querySelector('main#main-content');
+            var observer = root && window.MutationObserver ? new MutationObserver(apply) : null;
+            if (observer) {
+              observer.observe(root, {childList:true, subtree:true});
+              setTimeout(function(){ observer.disconnect(); }, 3500);
+            }
+            [80, 260, 600, 1000, 1800, 3000].forEach(function(delay){
+              setTimeout(apply, delay);
+            });
+          }
+          function horizontalKey(){ return '__aiym_pjax_hscroll_' + location.href; }
+          function load(url, push, scrollY, returnScroll, returnHorizontal){
+            if (currentRequest) currentRequest.abort();
+            currentRequest = new AbortController();
+            /* 请求期间不改变列表滚动位置；main 替换完成后，详情页一次性置顶，
+               返回列表则恢复历史状态中的原滚动位置。 */
+            document.body.setAttribute('aria-busy','true');
+            return fetch(url, {credentials:'same-origin', signal:currentRequest.signal, headers:{'X-Requested-With':'pjax'}})
+              .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+              .then(function(html){
+                var doc = new DOMParser().parseFromString(html, 'text/html');
+                var next = doc.querySelector('main#main-content');
+                var main = document.querySelector('main#main-content');
+                if (!next || !main) throw new Error('PJAX main not found');
+                if (push) history.pushState({aiymPjax:true, scrollY:0, returnScroll:typeof returnScroll === 'number' ? returnScroll : 0, returnUrl:location.href}, '', url);
+                refreshHead(doc);
+                document.title = doc.title;
+                main.innerHTML = next.innerHTML;
+                main.className = next.className;
+                /* main 容器复用，但内容已换页；允许前进详情播放一次进入效果。 */
+                delete main.dataset.aiymMaterialized;
+                runScripts(main);
+                if (window.AIYMPjaxRefresh) window.AIYMPjaxRefresh();
+                if (push) {
+                  jumpTo(0);
+                  /* 前进到详情才播放一次内容进入；返回列表走下面的瞬移恢复，不重演动画。 */
+                  if (window.AIYMPageEnter) requestAnimationFrame(function(){ window.AIYMPageEnter(main); });
+                } else {
+                  /* 首页/资源列表会在替换后异步补卡片高度；恢复期间最多等待约 2.4s。
+                     用户一开始滚动/触摸便立即撤销，既保证返回原位，也绝不和用户抢滚动。 */
+                  var restoreY = typeof scrollY === 'number' ? scrollY : 0;
+                  var cancelledRestore = false;
+                  function cancelRestore(){
+                    cancelledRestore = true;
+                    window.removeEventListener('wheel', cancelRestore);
+                    window.removeEventListener('touchstart', cancelRestore);
+                    window.removeEventListener('pointerdown', cancelRestore);
+                  }
+                  if (restoreY > 0) {
+                    window.addEventListener('wheel', cancelRestore, {passive:true});
+                    window.addEventListener('touchstart', cancelRestore, {passive:true});
+                    window.addEventListener('pointerdown', cancelRestore, {passive:true});
+                  }
+                  var restoreTries = 0;
+                  var lastHeight = document.documentElement.scrollHeight;
+                  var stablePasses = 0;
+                  (function restoreWhenReady(){
+                    if (cancelledRestore) return;
+                    /* 首次定位必做；后续仅在异步补卡片确实把页面推离目标时才再校正。
+                       不再把“已在正确位置”的页面每 150ms 强制 scrollTo 一次。 */
+                    var currentY = window.scrollY || document.documentElement.scrollTop || 0;
+                    if (restoreTries === 0 || Math.abs(currentY - restoreY) > 2) jumpTo(restoreY);
+                    restoreTries++;
+                    /* 列表仍在补高度时继续短暂观察；高度稳定后退出。 */
+                    var height = document.documentElement.scrollHeight;
+                    var canHold = (height - window.innerHeight) >= (restoreY - 2);
+                    stablePasses = (canHold && height === lastHeight) ? stablePasses + 1 : 0;
+                    lastHeight = height;
+                    if (restoreY <= 0 || stablePasses >= 2 || restoreTries >= 16) {
+                      cancelRestore();
+                      return;
+                    }
+                    setTimeout(restoreWhenReady, 150);
+                  })();
+                  restoreHorizontalScroll(returnHorizontal);
+                }
+                document.body.removeAttribute('aria-busy');
+                currentRequest = null;
+              })
+              .catch(function(err){
+                if (err.name !== 'AbortError') window.location.href = url;
+                document.body.removeAttribute('aria-busy');
+              });
+          }
+          document.addEventListener('click', function(e){
+            var link = e.target.closest && e.target.closest('a[data-pjax]');
+            if (!eligible(link, e)) return;
+            e.preventDefault();
+            var fromScroll = window.scrollY || document.documentElement.scrollTop || 0;
+            var fromHorizontal = horizontalScroll();
+            try {
+              sessionStorage.setItem('__aiym_pjax_scroll_' + location.href, String(fromScroll));
+              sessionStorage.setItem(horizontalKey(), JSON.stringify(fromHorizontal));
+            } catch (_) {}
+            if (history.state && history.state.aiymPjax) history.replaceState(Object.assign({}, history.state, {scrollY:fromScroll, horizontalScroll:fromHorizontal}), '', location.href);
+            load(link.href, true, 0, fromScroll, fromHorizontal);
+          }, true);
+          history.scrollRestoration = 'manual';
+          history.replaceState(Object.assign({}, history.state || {}, {aiymPjax:true, scrollY:window.scrollY||0}), '', location.href);
+          window.addEventListener('popstate', function(e){
+            if (!e.state || !e.state.aiymPjax) return;
+            var restore = typeof e.state.scrollY === 'number' ? e.state.scrollY : 0;
+            var restoreHorizontal = e.state.horizontalScroll || null;
+            try {
+              var saved = parseFloat(sessionStorage.getItem('__aiym_pjax_scroll_' + location.href));
+              if (isFinite(saved)) restore = saved;
+              if (!restoreHorizontal) {
+                var savedHorizontal = sessionStorage.getItem(horizontalKey());
+                if (savedHorizontal) restoreHorizontal = JSON.parse(savedHorizontal);
+              }
+            } catch (_) {}
+            load(location.href, false, restore, 0, restoreHorizontal);
+          });
+          window.addEventListener('pagehide', function(){
+            if (history.state && history.state.aiymPjax) history.replaceState(Object.assign({}, history.state, {scrollY:window.scrollY||0}), '', location.href);
           });
         })();
         /* ===== 图片「不阻塞交互」优化(全局) =====

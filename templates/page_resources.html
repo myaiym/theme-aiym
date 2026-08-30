@@ -8,7 +8,8 @@
     .hero-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.4em; height: 1.4em;
         margin-right: .12em; vertical-align: middle; line-height: 1; font-size: 1.02em; flex-shrink: 0;
         filter: drop-shadow(0 1px 1px rgba(0,0,0,.05)); text-align: center; }
-    .resources-page { padding: 28px 0 64px; }
+    /* 与首页、工具箱共用 layout.html 的流式聚合页容器。 */
+    .resources-page { width: 100%; max-width: none; margin: 0; padding: 28px 0 64px; }
     @media (min-width: 768px) { .resources-page { padding: 28px 0 80px; } }
 
     .res-hero { text-align: center; padding: 20px 0 0; margin-bottom: 8px; }
@@ -25,13 +26,11 @@
     .res-section { padding: 8px 0 0; }
     .res-section-title {
         font-size: var(--fs-section-title); font-weight: 700; color: var(--color-text-primary);
-        margin-bottom: 14px; padding: 0 4px 0 12px; display: block; position: relative;
+        margin-bottom: 14px; padding: 0 4px; display: block;
     }
-    .res-section-title::before {
-        content: ''; position: absolute; left: 0; top: 2px; bottom: 2px;
-        width: 3px; border-radius: 2px;
-        background: linear-gradient(180deg, var(--color-brand), var(--color-brand-hover));
-    }
+    /* 分类下划线已承担强调色职责，标题保持纯文字，避免两种蓝色装饰相撞。 */
+    .res-section-title::before { display: none; }
+    #res-rec .res-section-title::after { content: '左右滑动查看更多'; margin-left: 10px; font-size: 11px; font-weight: 500; color: var(--color-text-muted); vertical-align: 1px; }
 
     /* 卡片入场动画 */
     @keyframes resCardIn {
@@ -44,7 +43,7 @@
     .res-skeleton-card { border-radius: 16px !important; }
 
     /* 筛选栏（App商店下划线 tab） */
-    .res-filter { display: flex; gap: 22px; overflow-x: auto; padding: 0 2px; margin: 4px 0 6px;
+    .res-filter { display: flex; gap: 22px; overflow-x: auto; padding: 0 2px; margin: 4px 0 14px;
         scrollbar-width: none; position: sticky; top: var(--mobile-nav-height); z-index: 20;
         background: var(--color-bg-primary);
         scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
@@ -147,17 +146,18 @@
     .res-empty-icon { width: 48px; height: 48px; margin: 0 auto 12px; color: var(--color-text-secondary); opacity: 0.65; }
     .res-empty-text { font-size: 14px; }
 
-    /* 骨架屏 */
+    /* 骨架屏（对齐真实卡片盒模型：边框/padding/尺寸与 .res-hot-card 和 .res-tool-card 一致，避免切换时跳变） */
     @keyframes resShimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
     .res-skeleton { background: var(--color-bg-secondary); border-radius: 8px; }
     .res-skeleton-hot { display: flex; gap: 12px; overflow: hidden; }
-    .res-skeleton-hot-card { flex-shrink: 0; width: 360px; background: var(--color-bg-secondary); border-radius: 14px; overflow: hidden; }
+    .res-skeleton-hot-card { flex-shrink: 0; width: 360px; background: var(--color-bg-secondary); border-radius: 14px; overflow: hidden; border: 1px solid var(--color-border-primary); box-sizing: border-box; }
     .res-skeleton-cover { width: 100%; height: 160px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; }
     .res-skeleton-bottom { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
     .res-skeleton-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; flex-shrink: 0; }
     .res-skeleton-lines { flex: 1; }
     .res-skeleton-bar { height: 12px; border-radius: 6px; margin-bottom: 6px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; }
-    .res-skeleton-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--color-bg-secondary); border-radius: 16px; }
+    /* 竖条骨架与真实 .res-tool-card 对齐: padding 12px 14px + 边框 */
+    .res-skeleton-card { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--color-bg-secondary); border-radius: 16px; border: 1px solid var(--color-border-primary); box-sizing: border-box; }
     .res-skeleton-card-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; flex-shrink: 0; }
 
     /* 弱动效：关闭卡片入场与弹性 */
@@ -168,16 +168,79 @@
     .res-skeleton-card-lines { flex: 1; }
     .res-skeleton-card-bar { height: 12px; border-radius: 6px; margin-bottom: 6px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; }
 
+    @media (min-width: 768px) and (max-width: 1100px) and (max-height: 920px) {
+        /* 手机桌面版的中等宽度/矮视口：保持所有资源可扫读，并让页脚仍留在首屏。 */
+        .resources-page { padding: 10px 0 8px; }
+        .res-hero { padding: 4px 0 0; margin-bottom: 0; }
+        .res-hero__title { font-size: 23px; margin-bottom: 1px; }
+        .res-hero__desc { font-size: 11px; }
+        .res-filter { margin: 0 0 8px; }
+        .res-filter-chip { padding: 7px 2px; }
+        .res-section { padding-top: 2px; }
+        .res-section-title { margin-bottom: 7px; font-size: 15px; }
+        .res-hot-scroll { gap: 10px; padding-bottom: 4px; }
+        .res-hot-card, .res-skeleton-hot-card { width: 214px; }
+        .res-hot-cover, .res-skeleton-cover { height: 82px; }
+        .res-hot-bottom { padding: 6px 8px; gap: 6px; }
+        .res-hot-icon { width: 30px; height: 30px; border-radius: 9px; }
+        .res-hot-icon img { width: 17px; height: 17px; }
+        .res-hot-desc, .res-hot-right { display: none; }
+        .res-hot-name { font-size: 12px; }
+        .res-tool-grid { grid-template-columns: repeat(3, 1fr); gap: 7px; padding-bottom: 2px; }
+        .res-tool-card { padding: 7px 8px; gap: 7px; border-radius: 12px; }
+        .res-tool-icon { width: 30px; height: 30px; border-radius: 9px; }
+        .res-tool-icon img { width: 17px; height: 17px; }
+        .res-tool-desc, .res-tool-right { display: none; }
+        .res-tool-name { font-size: 12px; }
+    }
+
+    @media (min-width: 768px) {
+        /* 分类是内容内的二级控制，而不是第二个 header：与页面底色融合，仅保留当前项的轻量状态。 */
+        .resources-page .res-filter {
+            width: 100vw;
+            margin-left: calc(50% - 50vw);
+            min-height: 48px;
+            top: 56px;
+            margin-bottom: 18px;
+            align-items: center;
+            background: var(--color-bg-primary);
+            padding-inline: max(20px, calc((100vw - min(1280px, 100vw)) / 2 + clamp(20px, 3vw, 40px)));
+            box-sizing: border-box;
+
+        }
+        .resources-page .res-filter-chip {
+            min-height: 34px;
+            padding: 7px 12px;
+            border-radius: 10px;
+        }
+        .resources-page .res-filter-chip::after { display: none; }
+        .resources-page .res-filter-chip.active {
+            background: rgba(255,255,255,.62);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 1px 3px rgba(26,23,20,.07);
+        }
+        [data-theme="dark"] .resources-page .res-filter {
+            background: var(--color-bg-primary);
+        }
+        [data-theme="dark"] .resources-page .res-filter-chip.active {
+            background: rgba(255,255,255,.15);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 1px 3px rgba(0,0,0,.14);
+        }
+    }
+
     @media (max-width: 767px) {
         .page-content { padding: 0 8px; }
         /* 与首页统一：最后一块内容到页脚保持 50px，页脚到 Duck 栏由 layout 统一处理。 */
         .site-content { padding-bottom: 50px; }
         .resources-page { padding: 12px 0 0; }
         .res-hot-card, .res-tool-card { animation: none !important; }
+        #res-rec .res-section-title::after { display: none; }
         /* 推荐横滑卡：移动端缩窄 + 右侧渐隐 → 一眼可滑动 */
         .res-hot-card, .res-skeleton-hot-card { width: 240px; }
         .res-hot-cover { height: 124px; }
         .res-skeleton-cover { height: 124px; }
+        /* 移动端骨架底部与真实横滑卡同步收紧（padding 8px 11px, icon 34px） */
+        .res-skeleton-hot-card .res-skeleton-bottom { padding: 8px 11px; gap: 6px; }
+        .res-skeleton-hot-card .res-skeleton-icon { width: 34px; height: 34px; border-radius: 10px; }
         .res-hot-scroll {
             margin-right: 0; padding-right: 28px; flex-wrap: nowrap !important;
             -webkit-mask-image: linear-gradient(to right, #000 86%, transparent 98%);
@@ -323,9 +386,35 @@
                     btn.setAttribute('aria-selected', 'true');
                     currentCat = btn.getAttribute('data-cat');
                     currentPage = 1; noMore = false;
+                    showResSkeleton();
                     loadResources(true);
                 });
             });
+        }
+
+        /* ===== 展示骨架屏（切换分类时） ===== */
+        function showResSkeleton() {
+            var rec = document.getElementById('res-rec');
+            var all = document.getElementById('res-all');
+            if (rec) {
+                rec.innerHTML =
+                    '<h2 class="res-section-title">推荐资源</h2>' +
+                    '<div class="res-skeleton-hot">' +
+                    '<div class="res-skeleton-hot-card"><div class="res-skeleton-cover"></div><div class="res-skeleton-bottom"><div class="res-skeleton-icon"></div><div class="res-skeleton-lines"><div class="res-skeleton-bar" style="width:70%"></div><div class="res-skeleton-bar" style="width:50%"></div></div></div></div>' +
+                    '<div class="res-skeleton-hot-card"><div class="res-skeleton-cover"></div><div class="res-skeleton-bottom"><div class="res-skeleton-icon"></div><div class="res-skeleton-lines"><div class="res-skeleton-bar" style="width:65%"></div><div class="res-skeleton-bar" style="width:45%"></div></div></div></div>' +
+                    '<div class="res-skeleton-hot-card"><div class="res-skeleton-cover"></div><div class="res-skeleton-bottom"><div class="res-skeleton-icon"></div><div class="res-skeleton-lines"><div class="res-skeleton-bar" style="width:75%"></div><div class="res-skeleton-bar" style="width:55%"></div></div></div></div>' +
+                    '</div>';
+            }
+            if (all) {
+                all.innerHTML =
+                    '<h2 class="res-section-title">全部资源</h2>' +
+                    '<div class="res-tool-grid">' +
+                    '<div class="res-skeleton-card"><div class="res-skeleton-card-icon"></div><div class="res-skeleton-card-lines"><div class="res-skeleton-card-bar" style="width:60%"></div><div class="res-skeleton-card-bar" style="width:80%"></div></div></div>' +
+                    '<div class="res-skeleton-card"><div class="res-skeleton-card-icon"></div><div class="res-skeleton-card-lines"><div class="res-skeleton-card-bar" style="width:55%"></div><div class="res-skeleton-card-bar" style="width:70%"></div></div></div>' +
+                    '<div class="res-skeleton-card"><div class="res-skeleton-card-icon"></div><div class="res-skeleton-card-lines"><div class="res-skeleton-card-bar" style="width:65%"></div><div class="res-skeleton-card-bar" style="width:75%"></div></div></div>' +
+                    '<div class="res-skeleton-card"><div class="res-skeleton-card-icon"></div><div class="res-skeleton-card-lines"><div class="res-skeleton-card-bar" style="width:50%"></div><div class="res-skeleton-card-bar" style="width:65%"></div></div></div>' +
+                    '</div>';
+            }
         }
 
         /* ===== 推荐资源 ===== */
@@ -344,7 +433,7 @@
                 var visit = p.stats && p.stats.visit || 0;
                 var comment = p.stats && p.stats.comment || 0;
                 var hasImg = !!icon;
-                h += '<div class="res-hot-card"><a href="'+href+'">';
+                h += '<div class="res-hot-card"><a data-pjax href="'+href+'">';
                 h += '<div class="res-hot-cover">';
                 if (cover) h += '<img src="'+cover+'" alt="">';
                 else h += '<span class="res-hot-cover-letter">'+title.substring(0,1)+'</span>';
@@ -401,7 +490,7 @@
             var hasImg = !!icon;
             var div = document.createElement('div');
             div.className = 'res-tool-card';
-            var h = '<a href="'+href+'">';
+            var h = '<a data-pjax href="'+href+'">';
             h += '<div class="res-tool-icon'+(hasImg?' no-bg':'')+'">';
             if (icon) h += '<img src="'+icon+'" alt="">';
             else h += '<span class="res-tool-icon-letter">'+title.substring(0,1)+'</span>';

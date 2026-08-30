@@ -459,31 +459,41 @@ class PostPageManager {
   initCodeCopy() {
     document.querySelectorAll("pre code").forEach(code => {
       const pre = code.parentElement;
-      if (!pre || pre.querySelector(".code-copy-btn")) return;
+      if (!pre || pre.parentElement?.classList.contains("code-block")) return;
+
+      /* 复制按钮必须位于横向滚动的 pre 之外：否则手机左右拖命令时，按钮会跟着代码一起滑走。 */
+      const wrapper = document.createElement("div");
+      wrapper.className = "code-block";
+      wrapper.style.position = "relative";
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
       const btn = document.createElement("button");
       btn.className = "code-copy-btn";
-      btn.textContent = "复制";
+      btn.type = "button";
       btn.setAttribute("aria-label", "复制代码");
+      btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>复制</span>';
+      wrapper.appendChild(btn);
+
+      function copied() {
+        btn.querySelector("span").textContent = "已复制";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.querySelector("span").textContent = "复制"; btn.classList.remove("copied"); }, 2000);
+      }
+      function fallbackCopy(text) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0;";
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand("copy"); } finally { area.remove(); }
+      }
       btn.addEventListener("click", () => {
-        navigator.clipboard.writeText(code.textContent).then(() => {
-          btn.textContent = "已复制";
-          btn.classList.add("copied");
-          setTimeout(() => { btn.textContent = "复制"; btn.classList.remove("copied"); }, 2000);
-        }).catch(() => {
-          const range = document.createRange();
-          range.selectNodeContents(code);
-          const sel = window.getSelection();
-          sel.removeAllRanges();
-          sel.addRange(range);
-          document.execCommand("copy");
-          sel.removeAllRanges();
-          btn.textContent = "已复制";
-          btn.classList.add("copied");
-          setTimeout(() => { btn.textContent = "复制"; btn.classList.remove("copied"); }, 2000);
-        });
+        const text = code.textContent;
+        if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(copied).catch(() => { fallbackCopy(text); copied(); });
+        else { fallbackCopy(text); copied(); }
       });
-      pre.style.position = "relative";
-      pre.appendChild(btn);
     });
   }
 
@@ -500,12 +510,13 @@ class PostPageManager {
     overlay.className = "image-preview-overlay";
     overlay.innerHTML =
       '<div class="image-preview-container">' +
-      '<button class="image-preview-close" aria-label="关闭预览">&times;</button>' +
+      '<button class="image-preview-close" type="button" aria-label="关闭预览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
       '<img src="' + this.escapeHtml(src) + '" alt="' + this.escapeHtml(alt || "") + '" class="image-preview-img">' +
       (alt ? '<div class="image-preview-caption">' + this.escapeHtml(alt) + '</div>' : '') +
       '</div>';
     overlay.addEventListener("click", (e) => {
-      if (e.target === overlay || e.target.classList.contains("image-preview-close")) {
+      /* SVG 的 path 会成为事件 target，使用 closest 才能识别点击关闭图标本身。 */
+      if (e.target === overlay || (e.target.closest && e.target.closest(".image-preview-close"))) {
         this.closeImagePreview(overlay);
       }
     });
@@ -614,24 +625,12 @@ class CoverGallery {
 }
 
 /* --- Initialize --- */
-document.addEventListener("DOMContentLoaded", function () {
-  // Theme
-  var tm = new ThemeManager();
-  tm.init();
-
-  // Search Modal
-  var sm = new SearchModal();
-  sm.init();
-
-  // Post page (TOC, code copy, etc.)
+function aiymRefreshAfterPjax() {
+  // main.js 只加载一次；PJAX 替换 main 后，仅重新绑定随页面内容变化的模块。
   var pm = new PostPageManager();
   pm.init();
-
-  // Cover gallery
   var cg = new CoverGallery();
   cg.init();
-
-  // Nav active state
   var path = location.pathname;
   document.querySelectorAll("[data-nav-link]").forEach(function (link) {
     var href = link.getAttribute("data-href") || link.getAttribute("href");
@@ -644,4 +643,17 @@ document.addEventListener("DOMContentLoaded", function () {
       link.setAttribute("aria-current", "page");
     }
   });
+}
+window.AIYMPjaxRefresh = aiymRefreshAfterPjax;
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Theme
+  var tm = new ThemeManager();
+  tm.init();
+
+  // Search Modal
+  var sm = new SearchModal();
+  sm.init();
+
+  aiymRefreshAfterPjax();
 });

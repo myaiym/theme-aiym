@@ -3,7 +3,7 @@
 
 <!-- 资源卡片 - 横向列表风格 -->
 <div th:fragment="resource-card(post)" class="resource-card">
-    <a th:href="@{${post.status?.permalink}}" class="resource-card__link">
+    <a th:href="@{${post.status?.permalink}}" class="resource-card__link" data-pjax>
         <div class="resource-card__icon"
              th:with="iconUrl = ${#annotations.get(post, 'theme.aiym.fun/icon-url') ?: #annotations.get(post, 'iconUrl')}">
             <img th:if="${iconUrl}" th:src="${iconUrl}" alt="" class="resource-card__icon-img">

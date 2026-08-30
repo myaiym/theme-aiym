@@ -65,7 +65,7 @@
                     <div class="hot-scroll">
                         <a th:each="post, iter : ${allHotPosts.items}"
                            th:href="@{${post.status?.permalink}}"
-                           class="hot-card" th:attr="data-href=${post.status?.permalink}">
+                           class="hot-card" data-pjax th:attr="data-href=${post.status?.permalink}">
                             <div class="hot-cover">
                                 <img th:src="${post.spec.cover ?: fallbackCover}"
                                      th:alt="${post.spec.title}" class="hot-cover-img">
@@ -105,7 +105,7 @@
                     </div>
                     <div class="article-grid" id="article-grid">
                         <th:block th:each="post : ${allLatest.items}">
-                            <a th:href="@{${post.status?.permalink}}" class="article-card" th:attr="data-href=${post.status?.permalink}">
+                            <a th:href="@{${post.status?.permalink}}" class="article-card" data-pjax th:attr="data-href=${post.status?.permalink}">
                                 <div class="article-card__cover" th:if="${post.spec.cover}">
                                     <img th:src="${post.spec.cover}" th:alt="${post.spec.title}">
                                 </div>
@@ -153,8 +153,10 @@
     /* === 热门文章横滑（miniapp 精确对齐） === */
     .hot-section { margin-bottom: 4px; }
     .section-header { display: flex; align-items: center; gap: 10px; padding: 14px 0 8px; }
-    .section-title { font-size: var(--fs-section-title); font-weight: 700; color: var(--color-text-primary); position: relative; padding-left: 12px; }
-    .section-title::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; border-radius: 2px; background: linear-gradient(180deg, var(--color-brand), var(--color-brand-hover)); }
+    .hot-section .section-header::after { content: '左右滑动查看更多'; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--color-text-muted); }
+    /* 分类已用蓝色下划线表达当前状态；区块标题不再叠加蓝色竖条，层级更干净。 */
+    .section-title { font-size: var(--fs-section-title); font-weight: 700; color: var(--color-text-primary); }
+    .section-title::before { display: none; }
     .section-badge { font-size: 10px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--color-brand), var(--color-brand-hover)); padding: 2px 8px; border-radius: 8px; letter-spacing: 1px; }
     .hot-scroll {
         display: flex; gap: 12px; overflow-x: auto; overflow-y: hidden;
@@ -193,7 +195,10 @@
         from { opacity: 0; transform: translateY(12px); }
         to   { opacity: 1; transform: translateY(0); }
     }
-    .category-filter { text-align: left !important; background: var(--color-bg-primary); }
+    /* 分类是页面导航，内容标题与其留出明确呼吸区，避免下划线与标题装饰挤在一起。 */
+    .category-filter + .hot-section .section-header,
+    .category-filter + .article-section .section-header { padding-top: 20px; }
+    .category-filter { text-align: left !important; background: var(--color-bg-primary); margin-bottom: 0; }
     .category-scroll { display: flex; gap: 22px; padding: 0 2px; overflow-x: auto; scrollbar-width: none;
         -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
     .category-scroll::-webkit-scrollbar { display: none; }
@@ -229,7 +234,7 @@
         width: 100%; height: 180px;
         background: var(--color-bg-secondary);
     }
-    .article-card:hover .article-card__cover img { transform: scale(1.03); }
+    @media (hover: hover) and (pointer: fine) { .article-card:hover .article-card__cover img { transform: scale(1.03); } }
     .article-card__body { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
     .article-card__tags { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
     .article-card__tag { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: rgba(var(--color-brand-rgb, 66, 165, 245), 0.08); color: var(--color-brand-text); }
@@ -280,6 +285,7 @@
         .hot-body { padding: 10px 12px; }
         .hot-meta { font-size: 10px; gap: 6px; }
         .section-header { padding: 16px 0 10px; gap: 10px; }
+        .hot-section .section-header::after { display: none; }
         .section-title { font-size: 16px; }
         .hot-section { max-width: none !important; }
         .article-grid { grid-template-columns: 1fr; gap: 10px; max-width: none !important; }
@@ -292,7 +298,7 @@
         .article-card__title { font-size: 14px; line-height: 1.45; }
         .article-card__excerpt { font-size: 12px; margin-top: 4px; margin-bottom: 0; line-height: 1.5; -webkit-line-clamp: 1; }
         .article-card__footer { font-size: 10px; margin-top: 4px; }
-        .category-filter { position: sticky; top: var(--mobile-nav-height); max-width: none !important; margin-left: -8px !important; margin-right: -8px !important; width: calc(100% + 16px) !important; padding: 4px 8px 0 !important; }
+        .category-filter { position: sticky; top: var(--mobile-nav-height); max-width: none !important; margin-left: -8px !important; margin-right: -8px !important; width: calc(100% + 16px) !important; padding: 0 8px !important; }
         .category-scroll { gap: 22px; }
         .category-pill { min-height: 44px; padding: 8px 2px; font-size: var(--fs-filter); }
         .site-content { padding-bottom: 50px; }
@@ -303,6 +309,35 @@
 
     /* ===== 桌面端适配 ===== */
     @media (min-width: 768px) {
+        /* 分类是内容内的二级控制，而不是第二个 header：与页面底色融合，仅保留当前项的轻量状态。 */
+        .home .category-filter {
+            width: 100vw;
+            max-width: none !important;
+            margin-left: calc(50% - 50vw);
+            min-height: 48px;
+            background: var(--color-bg-primary);
+            padding-inline: max(20px, calc((100vw - min(1280px, 100vw)) / 2 + clamp(20px, 3vw, 40px))) !important;
+            box-sizing: border-box;
+
+        }
+        .home .category-scroll { width: 100%; min-height: 48px; align-items: center; }
+        .home .category-pill {
+            min-height: 34px;
+            padding: 7px 12px;
+            border-radius: 10px;
+        }
+        .home .category-pill::after { display: none; }
+        .home .category-pill--active {
+            background: rgba(255,255,255,.62);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.82), 0 1px 3px rgba(26,23,20,.07);
+        }
+        [data-theme="dark"] .home .category-filter {
+            background: var(--color-bg-primary);
+        }
+        [data-theme="dark"] .home .category-pill--active {
+            background: rgba(255,255,255,.15);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 1px 3px rgba(0,0,0,.14);
+        }
         .hot-card { width: 300px; height: 140px; }
         .hot-cover { width: 120px; height: 140px; min-height: 0; }
         .hot-title { font-size: 15px; -webkit-line-clamp: 3; }
@@ -387,6 +422,7 @@ var noMore = false;
             var card = document.createElement('a');
             card.href = post.status.permalink;
             card.className = 'hot-card';
+            card.setAttribute('data-pjax', '');
             card.innerHTML = '<div class="hot-cover">' + (cover ? '<img src="' + cover + '" alt="' + title + '" class="hot-cover-img">' : (fallbackCover ? '<img src="' + fallbackCover + '" alt="' + title + '" class="hot-cover-img">' : '<span class="hot-cover--empty"></span>')) + '<span class="hot-rank">#' + rank + '</span></div><div class="hot-body"><h3 class="hot-title">' + title + '</h3><div class="hot-meta"><span class="hot-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>' + visit + '</span></span><span class="hot-dot">·</span><span class="hot-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>' + comment + '</span></span></div></div>';
             return card;
         }
@@ -411,6 +447,7 @@ var noMore = false;
             var card = document.createElement('a');
             card.href = post.status.permalink;
             card.className = 'article-card';
+            card.setAttribute('data-pjax', '');
             card.innerHTML = coverHtml + '<div class="article-card__body">' + (tagsHtml ? '<div class="article-card__tags">' + tagsHtml + '</div>' : '') + '<h3 class="article-card__title">' + title + '</h3>' + (excerpt ? '<p class="article-card__excerpt">' + excerpt + '</p>' : '') + '<div class="article-card__footer"><div class="article-card__stats"><span class="article-card__stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span>' + visit + '</span></span><span class="article-card__stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>' + comment + '</span></span></div><time class="article-card__time">' + date + '</time></div></div>';
             return card;
         }

@@ -6,7 +6,7 @@
 <th:block th:fragment="content">
     <style>
     /* ===== 工具箱 Toolbox · Apple-inspired ===== */
-    .tb { max-width: 1100px; margin: 0 auto; padding: 28px 0 72px; }
+    .tb { width: 100%; max-width: none; margin: 0; padding: 28px 0 48px; }
 
     .hero-icon { display: inline-flex; align-items: center; justify-content: center; width: 1.4em; height: 1.4em;
         margin-right: .12em; vertical-align: middle; line-height: 1; font-size: 1.02em; flex-shrink: 0;
@@ -26,7 +26,8 @@
     /* Toolbar: search + cats */
     .tb-toolbar { margin-bottom: 22px;
         position: sticky; top: var(--mobile-nav-height); z-index: 20; background: var(--color-bg-primary); }
-    .tb-search { position: relative; margin-bottom: 14px; max-width: 440px; margin-left: auto; margin-right: auto; }
+    /* 搜索、分类与内容网格共用主容器宽度，避免桌面端出现三套视觉边界。 */
+    .tb-search { position: relative; width: 100%; max-width: none; margin: 0 0 14px; }
     .tb-search input {
         width: 100%; padding: 13px 44px 13px 18px; font-size: 15px;
         background: var(--color-bg-secondary);
@@ -67,11 +68,9 @@
     .tb-grid {
         display: grid; gap: 14px;
         grid-template-columns: repeat(2, 1fr);
-        max-width: 600px; margin: 0 auto;
+        width: 100%; max-width: none; margin: 0;
     }
-    @media (min-width: 768px) { .tb-grid { grid-template-columns: repeat(3, 1fr); max-width: 780px; gap: 16px; } }
-    @media (min-width: 1024px) { .tb-grid { grid-template-columns: repeat(4, 1fr); max-width: 960px; } }
-    @media (min-width: 1280px) { .tb-grid { grid-template-columns: repeat(5, 1fr); max-width: 1100px; } }
+    @media (min-width: 768px) { .tb-grid { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; } }
 
     /* Card — 轻量玻璃质感，连续圆角，无硬描边 */
     .tb-card {
@@ -137,12 +136,51 @@
     .tb-empty__icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--color-text-secondary); opacity: .65; }
     .tb-empty__text { font-size: 14px; color: var(--color-text-secondary); }
 
+    /* 骨架屏（对齐 .tb-card 盒模型：边框/padding/icon 与真实卡片一致，避免加载完成时跳变） */
+    @keyframes tbShimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    .tb-skeleton-card {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 15px; border: 1px solid var(--color-border-primary);
+        border-radius: 18px; box-sizing: border-box; background: var(--color-bg-secondary);
+    }
+    .tb-skeleton-icon {
+        width: 42px; height: 42px; border-radius: 23%; flex-shrink: 0;
+        background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%);
+        background-size: 800px 100%; animation: tbShimmer 1.5s infinite;
+    }
+    .tb-skeleton-info { flex: 1; min-width: 0; }
+    .tb-skeleton-bar {
+        height: 12px; border-radius: 6px; margin-bottom: 6px;
+        background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%);
+        background-size: 800px 100%; animation: tbShimmer 1.5s infinite;
+    }
+    .tb-skeleton-bar:last-child { margin-bottom: 0; }
+    @media (prefers-reduced-motion: reduce) {
+        .tb-skeleton-icon, .tb-skeleton-bar { animation-duration: 2.4s !important; }
+    }
+
     @keyframes tbUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
     /* 无障碍：尊重减少动效偏好 */
     @media (prefers-reduced-motion: reduce) {
         .tb-head, .tb-toolbar, .tb-card, .tb-count, .tb-empty { animation: none !important; }
         .tb-card, .tb-card:hover, .tb-card:active, .tb-icon { transition: none !important; transform: none !important; }
+    }
+
+    @media (min-width: 768px) and (max-width: 1100px) and (max-height: 920px) {
+        /* 手机开启桌面版时通常是中等宽度 + 矮视口：紧凑工具箱，而不是让页脚被挤到首屏外。 */
+        .tb { padding: 12px 0 16px; }
+        .tb-head { padding: 14px 0 12px; }
+        .tb-title { font-size: 24px; margin-bottom: 4px; }
+        .tb-toolbar { margin-bottom: 12px; }
+        .tb-search { margin-bottom: 8px; }
+        .tb-search input { padding: 10px 42px 10px 16px; }
+        .tb-cats { margin-bottom: 8px; }
+        .tb-cat { padding: 7px 2px; }
+        .tb-grid { gap: 10px; }
+        .tb-card { padding: 9px 10px; gap: 10px; border-radius: 16px; }
+        .tb-icon { width: 36px; height: 36px; }
+        .tb-desc { margin-top: 1px; }
     }
 
     @media (max-width: 767px) {
@@ -155,11 +193,14 @@
         .tb-toolbar { margin-bottom: 8px; top: var(--mobile-nav-height); }
         .tb-search { margin-bottom: 10px; max-width: 100%; }
         .tb-search input { padding: 11px 40px 11px 16px; font-size: 13px; }
-        .tb-cats { gap: 22px; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding: 0 2px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        .tb-cats { gap: 22px; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding: 0 28px 0 2px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; -webkit-mask-image: linear-gradient(to right, #000 88%, transparent 98%); mask-image: linear-gradient(to right, #000 88%, transparent 98%); }
         .tb-cats::-webkit-scrollbar { display: none; }
         .tb-cat { min-height: 44px; padding: 9px 2px; font-size: var(--fs-filter); flex-shrink: 0; }
         .tb-grid { gap: 10px; padding: 0; max-width: 100%; }
         .tb-card { padding: 12px; gap: 10px; border-radius: 16px; }
+        /* 移动端骨架卡与真实 .tb-card 同步收紧（padding 12px / gap 10px / icon 40px） */
+        .tb-skeleton-card { padding: 12px; gap: 10px; border-radius: 16px; }
+        .tb-skeleton-icon { width: 40px; height: 40px; }
         .tb-card:hover { transform: none; border-color: var(--color-border-secondary); background: var(--color-bg-secondary); }
         .tb-card:active { transform: scale(.97); }
         .tb-icon { width: 40px; height: 40px; }
@@ -185,7 +226,15 @@
             <div class="tb-cats" id="tb-cats" role="tablist" aria-label="工具分类"></div>
         </div>
 
-        <div class="tb-grid" id="tb-grid"></div>
+        <div class="tb-grid" id="tb-grid">
+            <!-- 初始化骨架屏（数据加载前展示，加载完成后由 renderGrid 替换） -->
+            <div class="tb-skeleton-card"><div class="tb-skeleton-icon"></div><div class="tb-skeleton-info"><div class="tb-skeleton-bar" style="width:60%"></div><div class="tb-skeleton-bar" style="width:80%"></div></div></div>
+            <div class="tb-skeleton-card"><div class="tb-skeleton-icon"></div><div class="tb-skeleton-info"><div class="tb-skeleton-bar" style="width:55%"></div><div class="tb-skeleton-bar" style="width:70%"></div></div></div>
+            <div class="tb-skeleton-card"><div class="tb-skeleton-icon"></div><div class="tb-skeleton-info"><div class="tb-skeleton-bar" style="width:65%"></div><div class="tb-skeleton-bar" style="width:75%"></div></div></div>
+            <div class="tb-skeleton-card"><div class="tb-skeleton-icon"></div><div class="tb-skeleton-info"><div class="tb-skeleton-bar" style="width:50%"></div><div class="tb-skeleton-bar" style="width:65%"></div></div></div>
+            <div class="tb-skeleton-card"><div class="tb-skeleton-icon"></div><div class="tb-skeleton-info"><div class="tb-skeleton-bar" style="width:58%"></div><div class="tb-skeleton-bar" style="width:72%"></div></div></div>
+            <div class="tb-skeleton-card"><div class="tb-skeleton-icon"></div><div class="tb-skeleton-info"><div class="tb-skeleton-bar" style="width:62%"></div><div class="tb-skeleton-bar" style="width:68%"></div></div></div>
+        </div>
         <div class="tb-count" id="tb-count" role="status"></div>
         <div class="tb-empty" id="tb-empty" style="display:none">
             <span class="tb-empty__icon iconify" data-icon="ri-search-line" aria-hidden="true"></span>
@@ -299,7 +348,7 @@
 
             var h = '';
             filtered.forEach(function(item, i) {
-                h += '<a class="tb-card" href="' + esc(item.path) + '">';
+                h += '<a class="tb-card" data-pjax href="' + esc(item.path) + '">';
                 h += '<div class="tb-icon" style="background:' + esc(item.bg) + '">';
                 h += '<span class="iconify" data-icon="' + esc(item.icon) + '" style="color:' + esc(item.color) + ';font-size:22px"></span>';
                 h += '</div>';
