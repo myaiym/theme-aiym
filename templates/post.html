@@ -23,12 +23,15 @@
     .post-share-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--color-border-primary); background: var(--color-bg-secondary); color: var(--color-text-muted); font-size: 12px; cursor: pointer; transition: all 0.2s; }
     @media (hover: hover) and (pointer: fine) { .post-share-btn:hover { color: var(--color-brand); border-color: var(--color-brand); } }
     .post-share-btn.is-copied { color: var(--color-success); border-color: var(--color-success); }
-    .post-content { font-size: 16px; line-height: 1.8; }
-    /* 主卡片可随桌面扩展，正文行宽保持阅读舒适度。 */
-    @media (min-width: 1024px) {
-        /* 资源信息与操作区保持流式；连续阅读内容收在舒适行宽内。 */
-        .post-content, .resource-supplement { max-width: 780px; }
+    /* 正文跟随主卡片可用宽度：资源详情撑满卡片；带目录的文章占用目录外的剩余宽度。
+       后台编辑器保留的单个换行也按换行显示；超长 URL / 连续英文不会撑破卡片。 */
+    .post-content {
+        width: 100%; max-width: none; font-size: 16px; line-height: 1.8;
+        overflow-wrap: anywhere; word-break: normal;
     }
+    .post-content :is(p, li, blockquote) { white-space: pre-line; }
+    .post-content :is(pre, code) { overflow-wrap: normal; word-break: normal; }
+    .resource-supplement { max-width: none; overflow-wrap: anywhere; }
 
     .post-content .code-block { position: relative; margin: 18px 0; }
     .post-content .code-block pre { margin: 0; }
@@ -169,8 +172,12 @@
     .post-cover { margin-bottom: 20px; border-radius: 12px; overflow: hidden; }
     .post-cover__img { width: 100%; max-height: 400px; object-fit: cover; display: block; border-radius: 12px; }
     .resource-download-info { background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: 14px; margin-bottom: 24px; overflow: hidden; }
+    /* 资源详情：真实应用图标直接服务于标题；下载卡只保留可操作的版本/系统信息。 */
+    .post-main--resource .post-title-page { display: flex; align-items: center; gap: 12px; }
+    .post-main--resource .post-title-page::before { content: ''; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 13px; background: var(--resource-icon) center / cover no-repeat, var(--color-bg-tertiary); box-shadow: 0 5px 14px rgba(20,35,50,.12); }
+    .post-main--resource .resource-download-info__row--identity { display: none; }
     .resource-download-info__rows { padding: 4px 16px; }
-    .resource-download-info__row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--color-border-secondary); }
+    .resource-download-info__row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--color-border-secondary); }
     .resource-download-info__row:last-child { border-bottom: none; }
     .resource-download-info__label { font-size: 13px; color: var(--color-text-muted); width: 50px; flex-shrink: 0; }
     .resource-download-info__value { font-size: 13px; color: var(--color-text-primary); font-weight: 500; display: flex; align-items: center; gap: 8px; flex: 1; }
@@ -278,11 +285,11 @@
             <!-- 下载信息（资源文章，JS 控制显隐） -->
             <div id="resource-download-section" class="resource-download-info" style="display:none">
                 <div class="resource-download-info__rows">
-                    <div class="resource-download-info__row">
+                    <div class="resource-download-info__row resource-download-info__row--identity">
                         <span class="resource-download-info__label">名称</span>
                         <span class="resource-download-info__value" th:text="${post.spec.title}">资源名称</span>
                     </div>
-                    <div class="resource-download-info__row" th:if="${#annotations.get(post, 'theme.aiym.fun/icon-url') ?: #annotations.get(post, 'iconUrl')}">
+                    <div class="resource-download-info__row resource-download-info__row--identity" th:if="${#annotations.get(post, 'theme.aiym.fun/icon-url') ?: #annotations.get(post, 'iconUrl')}">
                         <span class="resource-download-info__label">图标</span>
                         <span class="resource-download-info__value">
                             <span class="resource-download-info__icon"><img th:src="${#annotations.get(post, 'theme.aiym.fun/icon-url') ?: #annotations.get(post, 'iconUrl')}" alt="" loading="lazy"></span>
@@ -420,7 +427,7 @@
         restoreEditorImageSizing(content);
         if (!content) return;
 
-        var headings = content.querySelectorAll('h2, h3');
+        var headings = content.querySelectorAll('h1, h2, h3');
         if (headings.length === 0) {
             var sidebar = document.querySelector('[data-toc-sidebar]');
             var fab = document.querySelector('[data-toc-toggle]');
@@ -547,6 +554,12 @@
         if (!resourceCat || !postCat) return;
         var isResource = postCat === resourceCat;
         if (isResource) {
+            var main = layout.querySelector('.post-main');
+            if (main) {
+                main.classList.add('post-main--resource');
+                var resourceIcon = main.querySelector('.resource-download-info__icon img');
+                if (resourceIcon && resourceIcon.src) main.style.setProperty('--resource-icon', 'url("' + resourceIcon.src.replace(/"/g, '\\"') + '")');
+            }
             // 隐藏普通封面图（资源文章用 resource-hero）
             var postCover = document.querySelector('.post-cover');
             if (postCover) postCover.style.display = 'none';

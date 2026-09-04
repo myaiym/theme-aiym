@@ -5,8 +5,9 @@
 
 <th:block th:fragment="content">
     <style>
-    .ab { max-width: 720px; margin: 0 auto; padding: 28px 0 72px; }
-    @media (max-width: 767px) { .site-content { padding-bottom: 50px; } .ab { padding: 14px 14px 0; } .ab > :last-child { margin-bottom: 0; } .ab-hero { padding: 12px 0 10px; } .ab-hero__logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 10px; } .ab-hero__logo img { width: 34px; height: 34px; } .ab-hero__name { font-size: 18px; } .ab-hero__slogan { font-size: 12px; margin-top: 3px; letter-spacing: 1.5px; } .ab-hero__wave { font-size: 15px; margin-top: 6px; } }
+    /* 继承 .page-content 的 1200px 流式宽度，和资源中心、工具箱及普通页面保持一致。 */
+    .ab { width: 100%; max-width: none; margin: 0 auto; padding: 28px 0 72px; }
+    @media (max-width: 767px) { .site-content { padding-bottom: 50px; } .ab { padding: 14px 0 0; } .ab > :last-child { margin-bottom: 0; } .ab-hero { padding: 12px 0 10px; } .ab-hero__logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 10px; } .ab-hero__logo img { width: 34px; height: 34px; } .ab-hero__name { font-size: 18px; } .ab-hero__slogan { font-size: 12px; margin-top: 3px; letter-spacing: 1.5px; } .ab-hero__wave { font-size: 15px; margin-top: 6px; } }
 
     /* Hero */
     .ab-hero { text-align: center; padding: 28px 0 20px; }

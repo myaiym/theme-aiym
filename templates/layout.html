@@ -570,8 +570,9 @@
         (function(){
           var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           var selector = [
-            '.home > .category-filter', '.home > .hot-section', '.home > .article-section',
-            '.resources-page > .res-hero', '.resources-page > .res-filter', '.resources-page > .res-section',
+            /* 首页/资源的内容区均由骨架异步替换真实卡片；只动筛选控件，避免真实列表在替换后再闪现。 */
+            '.home > .category-filter',
+            '.resources-page > .res-hero', '.resources-page > .res-filter',
             '.post-layout > .post-main', '.post-layout > .post-toc-sidebar',
             '.tool-detail-page > *'
           ].join(',');

@@ -136,27 +136,26 @@
     .tb-empty__icon { width: 44px; height: 44px; margin: 0 auto 12px; color: var(--color-text-secondary); opacity: .65; }
     .tb-empty__text { font-size: 14px; color: var(--color-text-secondary); }
 
-    /* 骨架屏（对齐 .tb-card 盒模型：边框/padding/icon 与真实卡片一致，避免加载完成时跳变） */
-    @keyframes tbShimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    /* 骨架屏：与首页/资源中心统一低对比慢速掠光，盒模型与工具卡一致。 */
+    @keyframes aiym-tb-skeleton-sweep { from { background-position: 180% 0; } to { background-position: -80% 0; } }
     .tb-skeleton-card {
         display: flex; align-items: center; gap: 12px;
         padding: 14px 15px; border: 1px solid var(--color-border-primary);
         border-radius: 18px; box-sizing: border-box; background: var(--color-bg-secondary);
+        pointer-events: none;
     }
-    .tb-skeleton-icon {
-        width: 42px; height: 42px; border-radius: 23%; flex-shrink: 0;
-        background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%);
-        background-size: 800px 100%; animation: tbShimmer 1.5s infinite;
+    .tb-skeleton-icon, .tb-skeleton-bar {
+        background: linear-gradient(100deg, var(--color-bg-tertiary) 32%, color-mix(in srgb, var(--color-bg-secondary) 72%, var(--color-border-primary)) 46%, var(--color-bg-tertiary) 60%);
+        background-size: 260% 100%; animation: aiym-tb-skeleton-sweep 2.2s ease-in-out infinite;
     }
+    .tb-skeleton-icon { width: 42px; height: 42px; border-radius: 23%; flex-shrink: 0; }
     .tb-skeleton-info { flex: 1; min-width: 0; }
-    .tb-skeleton-bar {
-        height: 12px; border-radius: 6px; margin-bottom: 6px;
-        background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%);
-        background-size: 800px 100%; animation: tbShimmer 1.5s infinite;
-    }
+    .tb-skeleton-bar { height: 12px; border-radius: 7px; margin-bottom: 6px; }
+    .tb-skeleton-card:nth-child(2n) .tb-skeleton-bar { animation-delay: .14s; }
+    .tb-skeleton-card:nth-child(3n) .tb-skeleton-bar { animation-delay: .28s; }
     .tb-skeleton-bar:last-child { margin-bottom: 0; }
     @media (prefers-reduced-motion: reduce) {
-        .tb-skeleton-icon, .tb-skeleton-bar { animation-duration: 2.4s !important; }
+        .tb-skeleton-icon, .tb-skeleton-bar { animation: none !important; }
     }
 
     @keyframes tbUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
@@ -293,7 +292,7 @@
                             bg: item.bg || (brandColor + '18'),
                             cat: item.cat || '外部',
                             path: item.path,
-                            badge: item.badge || '',
+                            target: item.target || 'blank',
                             sort: 999
                         });
                     });
@@ -349,7 +348,10 @@
 
             var h = '';
             filtered.forEach(function(item, i) {
-                h += '<a class="tb-card" data-pjax href="' + esc(item.path) + '">';
+                var ext = (item.path || '').indexOf('http') === 0;
+                var tgt = ext && item.target !== 'self' ? ' target="_blank" rel="noopener"' : '';
+                var pj = ext ? '' : ' data-pjax';
+                h += '<a class="tb-card"' + pj + tgt + ' href="' + esc(item.path) + '">';
                 h += '<div class="tb-icon" style="background:' + esc(item.bg) + '">';
                 h += '<span class="iconify" data-icon="' + esc(item.icon) + '" style="color:' + esc(item.color) + ';font-size:22px"></span>';
                 h += '</div>';

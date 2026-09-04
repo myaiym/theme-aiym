@@ -145,10 +145,16 @@ spec:
             - $formkit: text
               name: cat
               label: "分类"
-            - $formkit: text
-              name: badge
-              label: "标签"
-              help: "可选，如：免费、hot"
+            - $formkit: select
+              name: target
+              label: "跳转方式"
+              help: "仅外链生效，默认新标签页打开"
+              value: "blank"
+              options:
+                - label: "新标签页打开"
+                  value: "blank"
+                - label: "当前页打开"
+                  value: "self"
           value: []
 
 

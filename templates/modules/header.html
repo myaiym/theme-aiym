@@ -74,7 +74,7 @@
                  th:with="currentUser = ${#authentication?.name != 'anonymousUser' ? contributorFinder.getContributor(#authentication.name) : null}">
                 <!-- 已登录 -->
                 <th:block th:if="${#authentication?.name != 'anonymousUser'}">
-                    <div class="header-user__trigger">
+                    <a th:href="${#authentication?.name == 'admin' ? '/console/' : '/uc/'}" class="header-user__trigger">
                         <div class="header-user__avatar">
                             <img th:if="${currentUser?.avatar}" th:src="${currentUser.avatar}" th:alt="${#authentication.name}" loading="lazy">
                             <svg th:unless="${currentUser?.avatar}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -83,7 +83,7 @@
                             <span class="header-user__name" th:text="${currentUser?.displayName ?: #authentication.name}">用户</span>
                             <span class="header-user__sub" th:text="${site.subtitle ?: '创意 · 技术 · 分享'}">创意 · 技术 · 分享</span>
                         </div>
-                    </div>
+                    </a>
                     <!-- 悬浮菜单 -->
                     <div class="header-user__menu">
                         <div class="header-user__menu-header">

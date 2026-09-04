@@ -30,7 +30,8 @@
     }
     /* 分类下划线已承担强调色职责，标题保持纯文字，避免两种蓝色装饰相撞。 */
     .res-section-title::before { display: none; }
-    #res-rec .res-section-title::after { content: '左右滑动查看更多'; margin-left: 10px; font-size: 11px; font-weight: 500; color: var(--color-text-muted); vertical-align: 1px; }
+    #res-rec .res-section-title { display: flex; align-items: center; }
+    #res-rec .res-section-title::after { content: '左右滑动查看更多'; margin-left: auto; font-size: 11px; font-weight: 500; color: var(--color-text-muted); }
 
     /* 卡片入场动画 */
     @keyframes resCardIn {
@@ -59,6 +60,8 @@
         transition: transform .28s cubic-bezier(.22,1,.36,1); }
     .res-filter-chip.active { color: var(--color-brand-text); font-weight: 600; }
     .res-filter-chip.active::after { transform: scaleX(1); }
+    .res-filter.is-loading .res-filter-chip { cursor: progress; }
+    .res-filter.is-loading .res-filter-chip:not(.active) { pointer-events: none; }
     .res-filter-chip:active { opacity: .6; }
 
     /* 横滑 */
@@ -146,27 +149,30 @@
     .res-empty-icon { width: 48px; height: 48px; margin: 0 auto 12px; color: var(--color-text-secondary); opacity: 0.65; }
     .res-empty-text { font-size: 14px; }
 
-    /* 骨架屏（对齐真实卡片盒模型：边框/padding/尺寸与 .res-hot-card 和 .res-tool-card 一致，避免切换时跳变） */
-    @keyframes resShimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    /* 骨架屏：与首页/工具箱统一为低对比慢速掠光，保持真实资源卡片的几何尺寸。 */
+    @keyframes aiym-res-skeleton-sweep { from { background-position: 180% 0; } to { background-position: -80% 0; } }
     .res-skeleton { background: var(--color-bg-secondary); border-radius: 8px; }
     .res-skeleton-hot { display: flex; gap: 12px; overflow: hidden; }
     .res-skeleton-hot-card { flex-shrink: 0; width: 360px; background: var(--color-bg-secondary); border-radius: 14px; overflow: hidden; border: 1px solid var(--color-border-primary); box-sizing: border-box; }
-    .res-skeleton-cover { width: 100%; height: 160px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; }
+    .res-skeleton-cover, .res-skeleton-icon, .res-skeleton-bar, .res-skeleton-card-icon, .res-skeleton-card-bar {
+        background: linear-gradient(100deg, var(--color-bg-tertiary) 32%, color-mix(in srgb, var(--color-bg-secondary) 72%, var(--color-border-primary)) 46%, var(--color-bg-tertiary) 60%);
+        background-size: 260% 100%; animation: aiym-res-skeleton-sweep 2.2s ease-in-out infinite;
+    }
+    .res-skeleton-cover { width: 100%; height: 160px; }
     .res-skeleton-bottom { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
-    .res-skeleton-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; flex-shrink: 0; }
+    .res-skeleton-icon { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; }
     .res-skeleton-lines { flex: 1; }
-    .res-skeleton-bar { height: 12px; border-radius: 6px; margin-bottom: 6px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; }
+    .res-skeleton-bar { height: 12px; border-radius: 7px; margin-bottom: 6px; }
     /* 竖条骨架与真实 .res-tool-card 对齐: padding 12px 14px + 边框 */
     .res-skeleton-card { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--color-bg-secondary); border-radius: 16px; border: 1px solid var(--color-border-primary); box-sizing: border-box; }
-    .res-skeleton-card-icon { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; flex-shrink: 0; }
-
-    /* 弱动效：关闭卡片入场与弹性 */
-    @media (prefers-reduced-motion: reduce) {
-        .res-hot-card, .res-tool-card { animation: none !important; transition: none !important; }
-        .res-skeleton-cover, .res-skeleton-icon, .res-skeleton-bar, .res-skeleton-card-icon { animation-duration: 2.4s !important; }
-    }
+    .res-skeleton-card-icon { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; }
     .res-skeleton-card-lines { flex: 1; }
-    .res-skeleton-card-bar { height: 12px; border-radius: 6px; margin-bottom: 6px; background: linear-gradient(90deg, var(--color-bg-secondary) 25%, rgba(0,0,0,0.04) 50%, var(--color-bg-secondary) 75%); background-size: 800px 100%; animation: resShimmer 1.5s infinite; }
+    .res-skeleton-card-bar { height: 12px; border-radius: 7px; margin-bottom: 6px; }
+    .res-skeleton-hot-card:nth-child(2n) .res-skeleton-cover, .res-skeleton-card:nth-child(2n) .res-skeleton-card-bar { animation-delay: .16s; }
+    .res-skeleton-hot-card:nth-child(3n) .res-skeleton-cover, .res-skeleton-card:nth-child(3n) .res-skeleton-card-bar { animation-delay: .32s; }
+    @media (prefers-reduced-motion: reduce) {
+        .res-skeleton-cover, .res-skeleton-icon, .res-skeleton-bar, .res-skeleton-card-icon, .res-skeleton-card-bar { animation: none !important; }
+    }
 
     @media (min-width: 768px) and (max-width: 1100px) and (max-height: 920px) {
         /* 手机桌面版的中等宽度/矮视口：保持所有资源可扫读，并让页脚仍留在首屏。 */
@@ -348,9 +354,12 @@
             try { var j = localStorage.getItem(key); map = j ? JSON.parse(j) : null; } catch(e) {}
             if (!map || !map.bySeed) { map = { bySeed: {}, used: {} }; }
             if (map.bySeed[seed] != null) return photoUrls[map.bySeed[seed]];
+            /* 从未被本批使用的图里随机挑一张，而非按图库顺序取（顺序会让每次都不随机）。 */
             var idx = -1;
-            for (var n = 0; n < photoUrls.length; n++) { if (!map.used[n]) { idx = n; break; } }
-            if (idx < 0) idx = Math.floor(Math.random() * photoUrls.length);
+            var unused = [];
+            for (var n = 0; n < photoUrls.length; n++) { if (!map.used[n]) unused.push(n); }
+            if (unused.length > 0) idx = unused[Math.floor(Math.random() * unused.length)];
+            else idx = Math.floor(Math.random() * photoUrls.length);
             map.bySeed[seed] = idx; map.used[idx] = true;
             try { localStorage.setItem(key, JSON.stringify(map)); } catch(e) {}
             return photoUrls[idx];
@@ -519,10 +528,16 @@
             hint.innerHTML = noMore ? '— 到底啦 —' : '';
         }
 
+        function setFilterLoading(active) {
+            var filter = document.getElementById('res-filter');
+            if (filter) filter.classList.toggle('is-loading', active);
+        }
+
         /* ===== 加载资源（分页） ===== */
         function loadResources(reset) {
             if (loading || noMore) return;
             loading = true;
+            if (reset) setFilterLoading(true);
             var catFilter = currentCat || resourceCat;
             var url = API+'posts?page='+currentPage+'&size='+pageSize+'&fieldSelector=spec.categories='+catFilter+'&sort=spec.publishTime,desc';
             fetch(url, {credentials:'same-origin'})
@@ -547,10 +562,12 @@
                     if (items.length < pageSize) noMore = true;
                     currentPage++;
                     loading = false;
+                    if (reset) setFilterLoading(false);
                     updateLoadHint();
                 })
                 .catch(function(){
                     loading = false;
+                    if (reset) setFilterLoading(false);
                     if (reset) {
                         document.getElementById('res-rec') && (document.getElementById('res-rec').innerHTML = '');
                         document.getElementById('res-all').innerHTML = '<div class="res-empty"><div class="res-empty-icon">❌</div><div class="res-empty-text">加载失败，请刷新重试</div></div>';
@@ -593,37 +610,46 @@
             if (!append) setupSentinel();
         };
 
-        /* ===== 横滑拖拽（与首页 hot-scroll 一致）===== */
+        /* ===== 横滑拖拽（移出容器松手也能可靠结束）===== */
         function initHotScrollDrag(el) {
             if (!el) return;
-            var down = false, moved = false, isMouse = false, startX = 0, startY = 0, baseScroll = 0;
+            var down = false, moved = false, isMouse = false, activePointerId = null;
+            var startX = 0, startY = 0, baseScroll = 0;
             el.addEventListener('pointerdown', function(e) {
                 if (e.pointerType === 'mouse' && e.button !== 0) return;
+                if (down) return;
                 down = true; moved = false;
                 isMouse = (e.pointerType === 'mouse');
+                activePointerId = e.pointerId;
                 startX = e.clientX; startY = e.clientY; baseScroll = el.scrollLeft;
                 el.classList.add('is-dragging'); el.style.userSelect = 'none';
             });
-            el.addEventListener('pointermove', function(e) {
-                if (!down) return;
+            function endDrag(e) {
+                if (!down || (e && e.pointerId != null && e.pointerId !== activePointerId)) return;
+                down = false; activePointerId = null;
+                el.classList.remove('is-dragging'); el.style.userSelect = '';
+            }
+            window.addEventListener('pointermove', function(e) {
+                if (!down || e.pointerId !== activePointerId) return;
+                /* 即使 pointerup 在浏览器边缘丢失，也以真实按钮状态立即解除拖拽 */
+                if (isMouse && e.buttons === 0) { endDrag(e); return; }
                 var dx = e.clientX - startX, dy = e.clientY - startY;
-                if (Math.abs(dx) > 5 && Math.abs(dx) > Math.abs(dy)) { moved = true; }
+                /* 桌面端轻微拖动也视为拖拽，避免斜向移动或短距离拖动误触卡片。 */
+                if (isMouse ? (Math.abs(dx) > 3 || Math.abs(dy) > 3) : (Math.abs(dx) > 5 && Math.abs(dx) > Math.abs(dy))) { moved = true; }
                 /* 触屏交给浏览器原生滚动；仅鼠标拖动时手动滚动 */
                 if (isMouse && moved) { el.scrollLeft = baseScroll - dx; }
             });
-            function endDrag() {
-                if (!down) return;
-                down = false;
-                el.classList.remove('is-dragging'); el.style.userSelect = '';
-            }
-            el.addEventListener('pointerup', endDrag);
-            el.addEventListener('pointercancel', endDrag);
+            window.addEventListener('pointerup', endDrag);
+            window.addEventListener('pointercancel', endDrag);
+            window.addEventListener('blur', function() { endDrag(); });
             el.addEventListener('dragstart', function(e) { e.preventDefault(); });
-            /* 拖拽横向滑动后松手，会残留一个 click 误触卡片跳转 → 在捕获阶段拦截 */
-            el.addEventListener('click', function(e) {
-                if (moved) { e.preventDefault(); e.stopPropagation(); }
+            /* 必须在 window 捕获阶段拦截，早于 layout.html 的 document PJAX 捕获监听。 */
+            window.addEventListener('click', function(e) {
+                if (el.isConnected && el.contains(e.target) && moved) {
+                    e.preventDefault(); e.stopPropagation();
+                }
             }, true);
-            /* 滚轮 */
+            /* 桌面滚轮在横滑区内转换为横向滚动。 */
             el.addEventListener('wheel', function(e) {
                 var delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
                 if (!delta) return;
