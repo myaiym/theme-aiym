@@ -518,52 +518,59 @@ var noMore = false;
             document.querySelectorAll('.category-pill').forEach(function(p) { p.classList.remove('category-pill--active'); p.setAttribute('aria-selected', 'false'); });
             pill.classList.add('category-pill--active');
             pill.setAttribute('aria-selected', 'true');
-            /* 切换分类后滚到顶部 */
-            window.scrollTo({ top: 0, behavior: 'auto' });
-            /* 显示骨架屏 */
+            /* 不强制回到页面顶部：全屏横滑的预期是原地换内容，避免固定头部/Tabbar产生跳帧。 */
+            /* 锁住数据区高度，避免分类内容数量不同导致文档高度瞬变，进而让 fixed 头部/Tabbar在移动浏览器上发生视觉跳帧。 */
+            var contentStage = document.querySelector('.home');
+            if (contentStage) {
+                contentStage.style.minHeight = contentStage.getBoundingClientRect().height + 'px';
+                document.body.classList.add('aiym-category-switching');
+            }
+            /* 首页与资源中心统一：切换后立即展示骨架，数据到齐后一次性替换。
+               高度已锁定，因此骨架不会再牵连固定头部与底部 Tabbar。 */
             var sk = buildSkeletons();
-            var hotSection = document.querySelector('.hot-scroll');
-            var articleSection = document.querySelector('.article-section');
-            if (hotSection) hotSection.innerHTML = sk.hot;
+            var hotScroll = document.querySelector('.hot-scroll');
+            if (hotScroll) hotScroll.innerHTML = sk.hot;
             grid.innerHTML = sk.cards;
             hint.style.display = 'none';
             loading = true;
             setCategoryLoading(true);
-            fetch(buildUrl(1, currentCategory), { credentials: 'same-origin' })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    var items = data.items || [];
-                    /* 重建热门区域（按分类加载 top 文章） */
+            var latestRequest = fetch(buildUrl(1, currentCategory), { credentials: 'same-origin' })
+                .then(function(r) { return r.json(); });
+            var hotUrl = '/apis/api.content.halo.run/v1alpha1/posts?page=1&size=' + hotCount + '&sort=stats.visit,desc';
+            if (currentCategory) hotUrl += '&fieldSelector=spec.categories=' + currentCategory;
+            var hotRequest = fetch(hotUrl, { credentials: 'same-origin' })
+                .then(function(r) { return r.json(); });
+            Promise.all([latestRequest, hotRequest])
+                .then(function(result) {
+                    var items = result[0].items || [];
+                    var hotItems = (result[1].items || []).slice(0, 5);
                     var hotSection = document.querySelector('.hot-section');
-                    if (hotSection) {
-                        hotSection.style.display = '';
-                        var hotUrl = '/apis/api.content.halo.run/v1alpha1/posts?page=1&size=' + hotCount + '&sort=stats.visit,desc';
-                        if (currentCategory) hotUrl += '&fieldSelector=spec.categories=' + currentCategory;
-                        fetch(hotUrl, { credentials: 'same-origin' })
-                            .then(function(r2) { return r2.json(); })
-                            .then(function(hotData) {
-                                var hotItems = (hotData.items || []).slice(0, 5);
-                                var hs = document.querySelector('.hot-scroll');
-                                if (hs) {
-                                    if (hotItems.length === 0) {
-                                        hs.innerHTML = '<div style="padding:12px 0;color:var(--color-text-muted);font-size:13px;">该分类暂无热门文章</div>';
-                                    } else {
-                                        hs.innerHTML = '';
-                                        hotItems.forEach(function(p, idx) { var c = buildHotCard(p, idx + 1); if (c) hs.appendChild(c); });
-                                    }
-                                }
-                            });
+                    var hotScroll = document.querySelector('.hot-scroll');
+                    if (hotSection) hotSection.style.display = '';
+                    if (hotScroll) {
+                        if (hotItems.length === 0) {
+                            hotScroll.innerHTML = '<div style="padding:12px 0;color:var(--color-text-muted);font-size:13px;">该分类暂无热门文章</div>';
+                        } else {
+                            hotScroll.innerHTML = '';
+                            hotItems.forEach(function(p, idx) { var c = buildHotCard(p, idx + 1); if (c) hotScroll.appendChild(c); });
+                        }
                     }
-                    /* 重建文章列表 */
                     grid.innerHTML = '';
                     items.forEach(function(post) { var card = buildCard(post); if (card) grid.appendChild(card); });
                     if (items.length === 0) { hint.innerHTML = '<span class="load-more-end">暂无文章</span>'; hint.style.display = 'flex'; }
                     else if (items.length < pageSize) { noMore = true; hint.innerHTML = '<span class="load-more-end">— 到底啦 —</span>'; hint.style.display = 'flex'; }
                     else { hint.style.display = 'none'; }
+                })
+                .catch(function() { hint.style.display = 'none'; })
+                .finally(function() {
                     loading = false;
                     setCategoryLoading(false);
-                })
-                .catch(function() { loading = false; setCategoryLoading(false); hint.style.display = 'none'; });
+                    /* 内容滑入完成后才释放高度锁，避免 fixed UI 与内容高度变化同帧重绘。 */
+                    window.setTimeout(function() {
+                        if (contentStage) contentStage.style.removeProperty('min-height');
+                        document.body.classList.remove('aiym-category-switching');
+                    }, 300);
+                });
         }
 
         /* 绑定分类 pill 点击 */

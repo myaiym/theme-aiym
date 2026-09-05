@@ -132,11 +132,11 @@ spec:
             - $formkit: color
               name: color
               label: "图标颜色"
-              value: "#9b7ed8"
+              value: "#42A5F5"
             - $formkit: color
               name: bg
               label: "图标背景色"
-              value: "#f3eefa"
+              value: "#EAF5FE"
             - $formkit: text
               name: path
               label: "链接地址"
@@ -155,8 +155,31 @@ spec:
                   value: "blank"
                 - label: "当前页打开"
                   value: "self"
-          value: []
-
+          value:
+            - name: "网络测速"
+              desc: "中科大测速网站"
+              icon: "ic:twotone-speed"
+              color: "#000000"
+              bg: "#f3eefa"
+              path: "https://test.ustc.edu.cn"
+              cat: "实用"
+              target: "blank"
+            - name: "图片压缩"
+              desc: "在线图片压缩工具"
+              icon: "ic:outline-photo-size-select-large"
+              color: "#1AA6E6"
+              bg: "#f3eefa"
+              path: "https://www.iloveimg.com/zh-cn/compress-image/compress-jpg"
+              cat: "实用"
+              target: "blank"
+            - name: "ITDOG"
+              desc: "网站测速与连通性检测"
+              icon: "boxicons:dog-body-filled"
+              color: "#181817"
+              bg: "#e0db1f"
+              path: "https://www.itdog.cn"
+              cat: "实用"
+              target: "blank"
 
 
 

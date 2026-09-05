@@ -18,31 +18,40 @@
         </a>
 
         <!-- 中：导航菜单（pill 样式） -->
-        <nav class="header-tabbar" aria-label="主导航">
+        <nav class="header-tabbar" aria-label="主导航" data-adaptive-nav>
             <div class="tabbar-track">
-                <th:block th:with="menu = ${theme.config.basic?.mainMenu != null and theme.config.basic.mainMenu != '' ? menuFinder.getByName(theme.config.basic.mainMenu) : menuFinder.getPrimary()}">
-                    <th:block th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}">
-                        <a th:each="item : ${menu.menuItems}"
-                           th:href="@{${item.status.href}}"
-                           th:target="${item.spec.target?.value}"
-                           th:classappend="${#annotations.contains(item, 'animation') ? 'animated-hover' : ''}"
-                           class="tabbar-item"
-                           data-nav-link
-                           th:attr="data-href=${item.status.href}">
-                            <span th:if="${#annotations.contains(item, 'icon') and #annotations.get(item, 'icon') != ''}"
-                                  class="iconify"
-                                  th:attr="data-icon=${#annotations.get(item, 'icon')}"
-                                  style="vertical-align:-0.15em;"></span>
-                            <span th:text="${item.status.displayName}">菜单</span>
-                        </a>
+                <div class="tabbar-primary">
+                    <!-- 始终读取 Halo 后台主菜单；主题不另设菜单来源，避免与后台配置重复。 -->
+                    <th:block th:with="menu = ${menuFinder.getPrimary()}">
+                        <th:block th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}">
+                            <a th:each="item : ${menu.menuItems}"
+                               th:href="@{${item.status.href}}"
+                               th:target="${item.spec.target?.value}"
+                               th:classappend="${#annotations.contains(item, 'animation') ? 'animated-hover' : ''}"
+                               class="tabbar-item"
+                               data-nav-link
+                               th:attr="data-href=${item.status.href}">
+                                <span th:if="${#annotations.contains(item, 'icon') and #annotations.get(item, 'icon') != ''}"
+                                      class="iconify"
+                                      th:attr="data-icon=${#annotations.get(item, 'icon')}"
+                                      style="vertical-align:-0.15em;"></span>
+                                <span th:text="${item.status.displayName}">菜单</span>
+                            </a>
+                        </th:block>
+                        <th:block th:if="${menu == null or #lists.isEmpty(menu.menuItems)}">
+                            <a href="/" class="tabbar-item" data-nav-link>首页</a>
+                            <a href="/archives" class="tabbar-item" data-nav-link>归档</a>
+                            <a href="/categories" class="tabbar-item" data-nav-link>分类</a>
+                            <a href="/tags" class="tabbar-item" data-nav-link>标签</a>
+                        </th:block>
                     </th:block>
-                    <th:block th:if="${menu == null or #lists.isEmpty(menu.menuItems)}">
-                        <a href="/" class="tabbar-item" data-nav-link>首页</a>
-                        <a href="/archives" class="tabbar-item" data-nav-link>归档</a>
-                        <a href="/categories" class="tabbar-item" data-nav-link>分类</a>
-                        <a href="/tags" class="tabbar-item" data-nav-link>标签</a>
-                    </th:block>
-                </th:block>
+                </div>
+                <div class="tabbar-overflow-wrap">
+                    <button type="button" class="tabbar-more" data-tabbar-more aria-label="更多导航" aria-expanded="false">
+                        <span aria-hidden="true">•••</span>
+                    </button>
+                    <div class="tabbar-overflow" data-tabbar-overflow role="menu" aria-label="更多导航"></div>
+                </div>
             </div>
         </nav>
 

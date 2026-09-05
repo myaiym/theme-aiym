@@ -624,6 +624,85 @@ class CoverGallery {
   }
 }
 
+function initAdaptiveNavigation() {
+  var nav = document.querySelector("[data-adaptive-nav]");
+  if (!nav || nav.dataset.adaptiveReady === "true") return;
+  nav.dataset.adaptiveReady = "true";
+  var track = nav.querySelector(".tabbar-track");
+  var primary = nav.querySelector(".tabbar-primary");
+  var more = nav.querySelector("[data-tabbar-more]");
+  var overflow = nav.querySelector("[data-tabbar-overflow]");
+  var items = Array.prototype.slice.call(primary.querySelectorAll(".tabbar-item"));
+  var timer;
+
+  function closeDesktopOverflow() {
+    overflow.classList.remove("is-open");
+    more.setAttribute("aria-expanded", "false");
+  }
+  function buildDesktopOverflow() {
+    overflow.innerHTML = "";
+    items.filter(function(item) { return item.classList.contains("is-overflowed"); }).forEach(function(item) {
+      var clone = item.cloneNode(true);
+      clone.className = "tabbar-overflow-item" + (item.classList.contains("active") ? " active" : "");
+      clone.removeAttribute("data-nav-link");
+      clone.removeAttribute("data-href");
+      clone.setAttribute("role", "menuitem");
+      overflow.appendChild(clone);
+    });
+  }
+  function adaptDesktopNav() {
+    if (window.matchMedia("(max-width: 767px)").matches) return;
+    items.forEach(function(item) { item.classList.remove("is-overflowed"); });
+    track.classList.remove("has-overflow");
+    closeDesktopOverflow();
+    /* 每次按真实文字与图标宽度测量，而非设置固定菜单数量。 */
+    if (primary.scrollWidth > primary.clientWidth) {
+      track.classList.add("has-overflow");
+      for (var i = items.length - 1; i >= 0 && primary.scrollWidth > primary.clientWidth; i--) {
+        items[i].classList.add("is-overflowed");
+      }
+      if (!items.some(function(item) { return item.classList.contains("is-overflowed"); })) track.classList.remove("has-overflow");
+    }
+    buildDesktopOverflow();
+  }
+  more.addEventListener("click", function(event) {
+    event.stopPropagation();
+    var open = !overflow.classList.contains("is-open");
+    closeDesktopOverflow();
+    if (open) { overflow.classList.add("is-open"); more.setAttribute("aria-expanded", "true"); }
+  });
+  document.addEventListener("click", function(event) { if (!nav.contains(event.target)) closeDesktopOverflow(); });
+  document.addEventListener("keydown", function(event) { if (event.key === "Escape") closeDesktopOverflow(); });
+  window.addEventListener("resize", function() { clearTimeout(timer); timer = setTimeout(adaptDesktopNav, 80); });
+  window.AIYMAdaptDesktopNav = adaptDesktopNav;
+  adaptDesktopNav();
+}
+
+function initMobileOverflowNav() {
+  var mobileNav = document.querySelector(".mobile-nav");
+  var menu = document.querySelector("[data-mobile-menu]");
+  if (!mobileNav || !menu || mobileNav.dataset.overflowReady === "true") return;
+  mobileNav.dataset.overflowReady = "true";
+  var items = Array.prototype.slice.call(mobileNav.querySelectorAll("[data-mobile-nav-link]"));
+  var more = mobileNav.querySelector("[data-mobile-menu-open]");
+  var closeButtons = menu.querySelectorAll("[data-mobile-menu-close]");
+  function setOpen(open) {
+    menu.classList.toggle("is-open", open);
+    menu.setAttribute("aria-hidden", open ? "false" : "true");
+    more.setAttribute("aria-expanded", open ? "true" : "false");
+    document.body.classList.toggle("mobile-menu-open", open);
+  }
+  /* 菜单超过四项时保留前四项，第五格稳定为“更多”；不超过四项则全部直显。 */
+  if (items.length > 4) {
+    items.slice(4).forEach(function(item) { item.hidden = true; });
+    more.hidden = false;
+  }
+  more.addEventListener("click", function() { setOpen(true); });
+  Array.prototype.forEach.call(closeButtons, function(button) { button.addEventListener("click", function() { setOpen(false); }); });
+  menu.querySelectorAll("a").forEach(function(link) { link.addEventListener("click", function() { setOpen(false); }); });
+  document.addEventListener("keydown", function(event) { if (event.key === "Escape") setOpen(false); });
+}
+
 /* --- Initialize --- */
 function aiymRefreshAfterPjax() {
   // main.js 只加载一次；PJAX 替换 main 后，仅重新绑定随页面内容变化的模块。
@@ -643,6 +722,7 @@ function aiymRefreshAfterPjax() {
       link.setAttribute("aria-current", "page");
     }
   });
+  if (window.AIYMAdaptDesktopNav) window.AIYMAdaptDesktopNav();
 }
 window.AIYMPjaxRefresh = aiymRefreshAfterPjax;
 
@@ -656,4 +736,8 @@ document.addEventListener("DOMContentLoaded", function () {
   sm.init();
 
   aiymRefreshAfterPjax();
+
+  // 自适应导航：桌面按实际宽度折叠；移动端菜单溢出到“更多”。
+  initAdaptiveNavigation();
+  initMobileOverflowNav();
 });

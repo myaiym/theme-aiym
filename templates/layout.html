@@ -32,7 +32,7 @@
     .site-header::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(105deg, rgba(255,255,255,.32), transparent 34%, rgba(255,255,255,.10) 68%, rgba(255,255,255,.24)); }
     [data-theme="dark"] .site-header { background: rgba(18,18,18,0.80); border-bottom-color: rgba(255,255,255,.10); box-shadow: 0 8px 28px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.12); }
     [data-theme="dark"] .site-header::before { background: linear-gradient(105deg, rgba(255,255,255,.10), transparent 34%, rgba(255,255,255,.04) 68%, rgba(255,255,255,.08)); }
-    .header-inner { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; width: 100%; max-width: 1520px; margin: 0 auto; height: 56px; padding: 0 clamp(20px, 4vw, 64px); box-sizing: border-box; }
+    .header-inner { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; width: 100%; max-width: 1520px; margin: 0 auto; height: 56px; padding: 0 clamp(20px, 4vw, 64px); box-sizing: border-box; }
 
     /* 导航栏 */
     .header-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -42,10 +42,22 @@
     .header-logo__text { display: flex; flex-direction: column; }
     .header-logo__title { font-size: 15px; font-weight: 700; color: var(--color-text-primary); line-height: 1.2; }
     .header-logo__sub { font-size: 9px; font-weight: 700; color: var(--color-text-muted); letter-spacing: 2px; text-transform: uppercase; }
-    .header-tabbar { grid-column: 2; min-width: 0; }
-    .tabbar-track { display: flex; align-items: center; padding: 3px; border-radius: 16px; border: 1px solid rgba(255,255,255,.48); background: rgba(255,255,255,.28); box-shadow: inset 0 1px 0 rgba(255,255,255,.56), 0 1px 2px rgba(26,23,20,.04); }
-    /* 桌面端菜单轨道适度加宽，避免居中菜单两侧视觉留白过大；中小桌面由下方断点收缩。 */
-    .tabbar-item { display: flex; align-items: center; gap: 5px; padding: 7px clamp(18px, 2.4vw, 36px); border-radius: 12px; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: color .2s ease, background-color .2s ease, box-shadow .2s ease; white-space: nowrap; }
+    .header-tabbar { grid-column: 2; min-width: 0; display: flex; justify-content: center; padding-inline: clamp(12px, 2vw, 32px); }
+    .tabbar-track { position: relative; display: flex; align-items: center; max-width: 100%; padding: 3px; border-radius: 16px; border: 1px solid rgba(255,255,255,.48); background: rgba(255,255,255,.28); box-shadow: inset 0 1px 0 rgba(255,255,255,.56), 0 1px 2px rgba(26,23,20,.04); }
+    .tabbar-primary { display: flex; align-items: center; min-width: 0; overflow: hidden; }
+    .tabbar-item.is-overflowed { display: none; }
+    .tabbar-overflow-wrap { display: none; position: relative; flex: 0 0 auto; }
+    .tabbar-track.has-overflow .tabbar-overflow-wrap { display: block; }
+    .tabbar-more { display: flex; align-items: center; justify-content: center; width: 34px; height: 30px; padding: 0; border: 0; border-radius: 11px; color: var(--color-text-secondary); background: transparent; font: 700 14px/1 inherit; letter-spacing: 1px; cursor: pointer; }
+    .tabbar-more:hover, .tabbar-more[aria-expanded="true"] { color: var(--color-brand-text); background: rgba(255,255,255,.62); }
+    .tabbar-overflow { position: absolute; top: calc(100% + 10px); right: 0; display: none; min-width: 142px; padding: 6px; border: 1px solid var(--color-border-primary); border-radius: 14px; background: var(--color-bg-secondary); box-shadow: 0 14px 34px rgba(0,0,0,.14); }
+    .tabbar-overflow.is-open { display: grid; gap: 2px; }
+    .tabbar-overflow .tabbar-overflow-item { display: flex; align-items: center; gap: 7px; padding: 9px 10px; color: var(--color-text-secondary); border-radius: 9px; font-size: 13px; text-decoration: none; white-space: nowrap; }
+    .tabbar-overflow .tabbar-overflow-item:hover, .tabbar-overflow .tabbar-overflow-item.active { color: var(--color-brand-text); background: var(--color-brand-light); }
+    [data-theme="dark"] .tabbar-more:hover, [data-theme="dark"] .tabbar-more[aria-expanded="true"] { background: rgba(255,255,255,.14); }
+    [data-theme="dark"] .tabbar-overflow { border-color: rgba(255,255,255,.12); box-shadow: 0 14px 34px rgba(0,0,0,.38); }
+    /* 桌面端菜单按实际可用宽度动态折叠；保留原本的菜单尺寸，避免为适配而牺牲易读性。 */
+    .tabbar-item { display: flex; flex: 0 0 auto; align-items: center; gap: 5px; padding: 7px clamp(18px, 2.4vw, 36px); border-radius: 12px; font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: color .2s ease, background-color .2s ease, box-shadow .2s ease; white-space: nowrap; }
     @media (hover: hover) and (pointer: fine) {
         .tabbar-item:hover { color: var(--color-text-primary); background: rgba(255,255,255,.34); }
         .tabbar-item:hover .iconify { transform: scale(1.15); }
@@ -112,6 +124,63 @@
     [data-theme="light"] .theme-icon--sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
     [data-theme="dark"] .theme-icon--moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
     [data-theme="dark"] .theme-icon--sun { opacity: 1; transform: rotate(0deg) scale(1); }
+
+    /* 移动端头部：去掉廉价的圆形底托，仅保留克制的图标触控区；登录入口与其他操作保持同一语言。 */
+    .mobile-header { border-bottom: 1px solid rgba(26,23,20,.035); box-shadow: 0 5px 18px rgba(26,23,20,.025); contain: layout paint; transform: translateZ(0); -webkit-transform: translateZ(0); }
+    .mobile-header__left { flex: 0 0 auto; }
+    .mobile-header__right { display: flex; align-items: center; justify-content: flex-end; min-width: 152px; margin-left: auto; gap: 3px; }
+    .mobile-header__action { width: 36px; height: 36px; padding: 0; border: 0; border-radius: 12px; background: transparent; color: var(--color-text-primary); }
+    .mobile-header__action svg { width: 19px; height: 19px; stroke-width: 1.8; }
+    .mobile-header__action:active { transform: scale(.94); background: rgba(66,165,245,.10); opacity: 1; }
+    [data-theme="dark"] .mobile-header { border-bottom-color: rgba(255,255,255,.06); box-shadow: 0 5px 18px rgba(0,0,0,.08); }
+    [data-theme="dark"] .mobile-header__action { color: var(--color-text-primary); }
+
+    /* 移动端主菜单：单层液态玻璃；选中格为同圆角的低对比灰玻璃，图标和文字更像原生 Tab Bar。 */
+    body .mobile-nav { left: 14px; right: 14px; bottom: calc(12px + env(safe-area-inset-bottom,0px)); min-height: 58px; gap: 0; padding: 3px; border: 1px solid rgba(255,255,255,.68); border-radius: 28px; background: rgba(255,255,255,.72); -webkit-backdrop-filter: saturate(175%) blur(28px); backdrop-filter: saturate(175%) blur(28px); box-shadow: 0 10px 28px rgba(31,38,46,.10), inset 0 1px 0 rgba(255,255,255,.82); contain: layout paint; transform: translateZ(0); -webkit-transform: translateZ(0); }
+    body .mobile-nav-item { min-height: 52px; border-radius: 24px; color: var(--color-text-secondary); transition: color .18s ease, background-color .18s ease, transform .18s ease; }
+    body .mobile-nav-icon { width: 20px; height: 20px; margin-bottom: 2px; }
+    body .mobile-nav-icon .iconify { width: 20px !important; height: 20px !important; }
+    body .mobile-nav-icon svg { stroke-width: 1.85; }
+    body .mobile-nav-label { margin-top: 1px; font-size: 10.5px; line-height: 1.1; font-weight: 500; letter-spacing: -.08px; }
+    body .mobile-nav-item--active, body .mobile-nav-item.mobile-nav-item--active { color: var(--color-brand-text); background: linear-gradient(180deg, rgba(109,109,109,.16), rgba(109,109,109,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 2px 6px rgba(31,38,46,.055); border-radius: 24px; font-weight: 600; }
+    body .mobile-nav-item:active { transform: scale(.96); background: rgba(66,165,245,.08); }
+    [data-theme="dark"] body .mobile-nav { border-color: rgba(255,255,255,.13); background: rgba(42,42,42,.72); box-shadow: 0 10px 28px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.10); }
+    [data-theme="dark"] body .mobile-nav-item--active, [data-theme="dark"] body .mobile-nav-item.mobile-nav-item--active { background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08)); box-shadow: inset 0 1px 0 rgba(255,255,255,.20), 0 2px 6px rgba(0,0,0,.16); }
+
+    /* 切分类时固定 UI 不参与任何动画、过渡或 backdrop-filter 重绘，保持位置完全钉死。 */
+    body.aiym-category-switching .mobile-header,
+    body.aiym-category-switching .mobile-nav,
+    body.aiym-category-switching .mobile-header *,
+    body.aiym-category-switching .mobile-nav * { animation: none !important; transition: none !important; }
+    body.aiym-category-switching .mobile-header,
+    body.aiym-category-switching .mobile-nav { will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+
+    /* 移动端全量菜单：仅在项目超过底栏容量时由“更多”打开。 */
+    .mobile-menu { position: fixed; inset: 0; z-index: 220; visibility: hidden; pointer-events: none; }
+    body.mobile-menu-open { overflow: hidden; }
+    .mobile-menu.is-open { visibility: visible; pointer-events: auto; }
+    .mobile-menu-backdrop { position: absolute; inset: 0; width: 100%; border: 0; background: rgba(12,18,24,.28); opacity: 0; transition: opacity .22s ease; }
+    .mobile-menu.is-open .mobile-menu-backdrop { opacity: 1; }
+    .mobile-menu-content { position: absolute; right: 12px; bottom: calc(var(--mobile-nav-height) + 12px); left: 12px; max-height: min(70vh, 520px); overflow: auto; padding: 16px; border: 1px solid rgba(255,255,255,.52); border-radius: 24px; background: rgba(255,255,255,.88); box-shadow: 0 20px 50px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.72); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); opacity: 0; transform: translateY(14px) scale(.98); transition: opacity .22s ease, transform .22s ease; }
+    .mobile-menu.is-open .mobile-menu-content { opacity: 1; transform: translateY(0) scale(1); }
+    [data-theme="dark"] .mobile-menu-content { border-color: rgba(255,255,255,.12); background: rgba(34,34,34,.90); box-shadow: 0 20px 50px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.10); }
+    .mobile-menu-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 0 8px; }
+    .mobile-menu-title { margin: 0; font-size: 15px; color: var(--color-text-primary); }
+    .mobile-menu-close { display: grid; width: 32px; height: 32px; place-items: center; padding: 0; border: 0; border-radius: 50%; color: var(--color-text-secondary); background: var(--color-bg-tertiary); font: 400 24px/1 sans-serif; cursor: pointer; }
+    .mobile-menu-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .mobile-menu-link { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 13px; color: var(--color-text-secondary); background: rgba(255,255,255,.42); text-decoration: none; font-size: 14px; }
+    .mobile-menu-link:active { background: var(--color-brand-light); color: var(--color-brand-text); }
+    [data-theme="dark"] .mobile-menu-link { background: rgba(255,255,255,.06); }
+    .mobile-nav-more { border: 0; font: inherit; cursor: pointer; }
+    /* style.css 的 .mobile-nav-item 需要 flex 展示；溢出项的 hidden 属性必须优先隐藏。 */
+    .mobile-nav .mobile-nav-item[hidden] { display: none !important; }
+    /* 分类横滑：Android/WebKit 在固定毛玻璃上与 translate 动画合成时会让头部/Tabbar跳帧。
+       因此仅对 Tab 下方的新数据做短促淡入，不再移动任何布局层。 */
+    @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+        .home.category-swipe-fade #hot-section, .home.category-swipe-fade .article-section, .resources-page.category-swipe-fade #res-rec, .resources-page.category-swipe-fade #res-all, .tb.category-swipe-fade #tb-grid, .tb.category-swipe-fade #tb-count, .tb.category-swipe-fade #tb-empty { animation: categoryContentFade .18s ease-out both; }
+        @keyframes categoryContentFade { from { opacity: .72; } to { opacity: 1; } }
+    }
+    @media (prefers-reduced-motion: reduce) { .mobile-menu-backdrop, .mobile-menu-content { transition: none; } }
 
     /* 用户头像区域 */
     .header-user { position: relative; }
@@ -500,7 +569,75 @@
          th:attr="data-cover-gallery=${theme.config.appearance?.coverGallery ?: '[]'},
                   data-default-cover=${theme.config.basic?.defaultCover ?: ''}"></div>
 
-    <script th:src="@{/assets/js/main.js?v=1.0.8-preview-close}" defer></script>
+    <script th:src="@{/assets/js/main.js?v=1.0.11-mobile-five}" defer></script>
+        <script>
+        /* 移动端全屏分类横滑：首页、资源和工具箱任意内容区域都可左右划切换分类。 */
+        (function () {
+          var start = null;
+          var controllers = [
+            { root: '.home', tabs: '.category-pill', active: 'category-pill--active', scroller: '.category-scroll' },
+            { root: '.resources-page', tabs: '.res-filter-chip', active: 'active', scroller: '.res-filter' },
+            { root: '.tb', tabs: '.tb-cat', active: 'active', scroller: '#tb-cats' }
+          ];
+          function getController(target) {
+            if (!target || !target.closest) return null;
+            for (var i = 0; i < controllers.length; i++) {
+              var root = target.closest(controllers[i].root);
+              if (root) return { config: controllers[i], root: root };
+            }
+            return null;
+          }
+          function animate(root, direction) {
+            /* 不使用 translate：真实移动浏览器中它会触发 fixed 毛玻璃层重新合成。 */
+            root.classList.remove('category-swipe-left', 'category-swipe-right');
+            void root.offsetWidth;
+            root.classList.add('category-swipe-fade');
+            window.setTimeout(function () { root.classList.remove('category-swipe-fade'); }, 220);
+          }
+          function keepTabVisible(root, config, tab) {
+            /* 只滚动 Tab 自己的横向容器，绝不使用 scrollIntoView（它会连带滚动页面，导致 fixed 头部/Tabbar跳帧）。 */
+            var scroller = root.querySelector(config.scroller);
+            if (!scroller || scroller.scrollWidth <= scroller.clientWidth) return;
+            var tabRect = tab.getBoundingClientRect();
+            var scrollerRect = scroller.getBoundingClientRect();
+            var delta = 0;
+            if (tabRect.left < scrollerRect.left + 12) delta = tabRect.left - scrollerRect.left - 12;
+            else if (tabRect.right > scrollerRect.right - 12) delta = tabRect.right - scrollerRect.right + 12;
+            if (delta) scroller.scrollTo({ left: scroller.scrollLeft + delta, behavior: 'smooth' });
+          }
+          function switchByGesture(controller, dx, dy) {
+            if (!controller || Math.abs(dx) < 52 || Math.abs(dx) < Math.abs(dy) * 1.35) return;
+            var root = controller.root, config = controller.config;
+            if (root.querySelector('.category-filter.is-loading, .res-filter.is-loading')) return;
+            var tabs = Array.prototype.slice.call(root.querySelectorAll(config.tabs));
+            if (tabs.length < 2) return;
+            var activeIndex = tabs.findIndex(function (tab) { return tab.classList.contains(config.active); });
+            if (activeIndex < 0) activeIndex = 0;
+            var direction = dx < 0 ? -1 : 1;
+            var nextIndex = activeIndex - direction;
+            if (nextIndex < 0 || nextIndex >= tabs.length || tabs[nextIndex].disabled) return;
+            animate(root, direction);
+            tabs[nextIndex].click();
+            keepTabVisible(root, config, tabs[nextIndex]);
+          }
+          document.addEventListener('touchstart', function (event) {
+            if (window.innerWidth >= 768 || !event.touches || event.touches.length !== 1) return;
+            /* 输入框、弹窗和本身可横滑的推荐卡片保持原生手势，避免它们触发分类切换。 */
+            if (event.target.closest && event.target.closest('input, textarea, select, .search-modal, .mobile-menu, .hot-scroll, .res-hot-scroll, .res-skeleton-hot')) return;
+            var controller = getController(event.target);
+            if (!controller) return;
+            var touch = event.touches[0];
+            start = { controller: controller, x: touch.clientX, y: touch.clientY };
+          }, { passive: true, capture: true });
+          document.addEventListener('touchend', function (event) {
+            if (!start || !event.changedTouches || !event.changedTouches.length) return;
+            var gesture = start; start = null;
+            var touch = event.changedTouches[0];
+            switchByGesture(gesture.controller, touch.clientX - gesture.x, touch.clientY - gesture.y);
+          }, { passive: true, capture: true });
+          document.addEventListener('touchcancel', function () { start = null; }, { passive: true, capture: true });
+        })();
+        </script>
         <script>
         (function () {
           /* 返回不刷新、保持原样：
@@ -570,9 +707,7 @@
         (function(){
           var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           var selector = [
-            /* 首页/资源的内容区均由骨架异步替换真实卡片；只动筛选控件，避免真实列表在替换后再闪现。 */
-            '.home > .category-filter',
-            '.resources-page > .res-hero', '.resources-page > .res-filter',
+            /* 首页异步卡片加载，禁止首屏再对分类栏做入场动画；否则会让固定头部/底栏产生“跟着回弹”的视觉错觉。 */
             '.post-layout > .post-main', '.post-layout > .post-toc-sidebar',
             '.tool-detail-page > *'
           ].join(',');
