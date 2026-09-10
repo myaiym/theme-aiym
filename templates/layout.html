@@ -552,8 +552,9 @@
             <div class="site-notice__inner">
                 <!-- 公告入口固定使用轻量喇叭 SVG，避免 Iconify 异步加载或样式覆盖导致图标缺失。 -->
                 <svg class="site-notice__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" role="img" aria-label="公告"><path d="M3 10v4a2 2 0 0 0 2 2h3l5 4V4L8 8H5a2 2 0 0 0-2 2Z"/><path d="M17 9.5a4 4 0 0 1 0 5"/><path d="M19.8 7a7.5 7.5 0 0 1 0 10"/></svg>
+                <!-- 链接仅接受站内绝对路径或 http(s)，防止主题配置中的危险协议进入 href。 -->
                 <button type="button" class="site-notice__text" data-site-notice-detail-trigger
-                        th:if="${theme.config.notice?.link == null or theme.config.notice.link == ''}"
+                        th:if="${theme.config.notice?.link == null or theme.config.notice.link == '' or ((not #strings.startsWith(theme.config.notice.link, '/')) and (not #strings.startsWith(theme.config.notice.link, 'http://')) and (not #strings.startsWith(theme.config.notice.link, 'https://')))}"
                         th:attr="data-notice-detail=${theme.config.notice?.detail ?: theme.config.notice.text},aria-label=${'查看公告详情：' + theme.config.notice.text}">
                     <span class="site-notice__text-rail">
                         <span class="site-notice__text-track" data-site-notice-track th:text="${theme.config.notice.text}">公告内容</span>
@@ -561,14 +562,14 @@
                     </span>
                 </button>
                 <span class="site-notice__text" data-site-notice-text
-                      th:if="${theme.config.notice?.link != null and theme.config.notice.link != ''}">
+                      th:if="${theme.config.notice?.link != null and theme.config.notice.link != '' and (#strings.startsWith(theme.config.notice.link, '/') or #strings.startsWith(theme.config.notice.link, 'http://') or #strings.startsWith(theme.config.notice.link, 'https://'))}">
                     <span class="site-notice__text-rail">
                         <span class="site-notice__text-track" data-site-notice-track th:text="${theme.config.notice.text}">公告内容</span>
                         <span class="site-notice__text-track" aria-hidden="true" th:text="${theme.config.notice.text}">公告内容</span>
                     </span>
                 </span>
                 <a class="site-notice__link"
-                   th:if="${theme.config.notice?.link != null and theme.config.notice.link != ''}"
+                   th:if="${theme.config.notice?.link != null and theme.config.notice.link != '' and (#strings.startsWith(theme.config.notice.link, '/') or #strings.startsWith(theme.config.notice.link, 'http://') or #strings.startsWith(theme.config.notice.link, 'https://'))}"
                    th:href="@{${theme.config.notice.link}}"
                    th:text="${theme.config.notice?.linkText ?: '查看详情'}">查看详情</a>
                 <button type="button" class="site-notice__close" data-site-notice-close aria-label="关闭公告"
