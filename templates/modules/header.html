@@ -24,19 +24,32 @@
                     <!-- 始终读取 Halo 后台主菜单；主题不另设菜单来源，避免与后台配置重复。 -->
                     <th:block th:with="menu = ${menuFinder.getPrimary()}">
                         <th:block th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}">
-                            <a th:each="item : ${menu.menuItems}"
-                               th:href="@{${item.status.href}}"
-                               th:target="${item.spec.target?.value}"
-                               th:classappend="${#annotations.contains(item, 'animation') ? 'animated-hover' : ''}"
-                               class="tabbar-item"
-                               data-nav-link
-                               th:attr="data-href=${item.status.href}">
-                                <span th:if="${#annotations.contains(item, 'icon') and #annotations.get(item, 'icon') != ''}"
-                                      class="iconify"
-                                      th:attr="data-icon=${#annotations.get(item, 'icon')}"
-                                      style="vertical-align:-0.15em;"></span>
-                                <span th:text="${item.status.displayName}">菜单</span>
-                            </a>
+                            <div class="tabbar-menu-group" th:each="item : ${menu.menuItems}">
+                                <a th:href="@{${item.status.href}}"
+                                   th:target="${item.spec.target?.value}"
+                                   th:classappend="${#annotations.contains(item, 'animation') ? 'animated-hover' : ''}"
+                                   class="tabbar-item"
+                                   data-nav-link
+                                   th:attr="data-href=${item.status.href}">
+                                    <span th:if="${#annotations.contains(item, 'icon') and #annotations.get(item, 'icon') != ''}"
+                                          class="iconify"
+                                          th:attr="data-icon=${#annotations.get(item, 'icon')}"
+                                          style="vertical-align:-0.15em;"></span>
+                                    <span th:text="${item.status.displayName}">菜单</span>
+                                    <svg th:if="${item.children != null and not #lists.isEmpty(item.children)}" class="tabbar-submenu-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
+                                </a>
+                                <div th:if="${item.children != null and not #lists.isEmpty(item.children)}" class="tabbar-submenu" role="menu" th:attr="aria-label=${item.status.displayName + ' 子菜单'}">
+                                    <a th:each="child : ${item.children}"
+                                       th:href="@{${child.status.href}}"
+                                       th:target="${child.spec.target?.value}"
+                                       class="tabbar-submenu-item"
+                                       role="menuitem"
+                                       th:attr="data-href=${child.status.href}">
+                                        <span th:if="${#annotations.contains(child, 'icon') and #annotations.get(child, 'icon') != ''}" class="iconify" th:attr="data-icon=${#annotations.get(child, 'icon')}" style="vertical-align:-0.15em;"></span>
+                                        <span th:text="${child.status.displayName}">子菜单</span>
+                                    </a>
+                                </div>
+                            </div>
                         </th:block>
                         <th:block th:if="${menu == null or #lists.isEmpty(menu.menuItems)}">
                             <a href="/" class="tabbar-item" data-nav-link>首页</a>

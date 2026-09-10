@@ -4,18 +4,30 @@
       lang="zh-CN">
 
 <th:block th:fragment="content">
+    <style>
+    .tag-page { max-width: 1200px; margin: 0 auto; padding: 24px 0 56px; }
+    .tag-header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .tag-title { margin: 0; color: var(--color-text-primary); font-size: 26px; line-height: 1.25; letter-spacing: -.03em; }
+    .tag-header__hint { max-width: 420px; margin: 0; color: var(--color-text-muted); font-size: 13px; line-height: 1.6; text-align: right; }
+    .tag-load-more { min-height: 28px; justify-content: center; padding-top: 12px; color: var(--color-text-muted); font-size: 12px; }
+    .tag-page [data-tag-load-sentinel] { display: block !important; height: 1px !important; }
+    @media (max-width: 767px) { .tag-page { padding: 16px 0 28px; } .tag-header { align-items: flex-start; flex-direction: column; gap: 4px; margin-bottom: 14px; } .tag-title { font-size: 21px; } .tag-header__hint { text-align: left; font-size: 12px; } }
+    </style>
     <div class="tag-page">
         <header class="tag-header">
             <h1 class="tag-title" th:text="'#' + ${tag.spec.displayName}">#标签</h1>
+            <p class="tag-header__hint">查看与该关键词相关的全部文章。</p>
         </header>
 
-        <div class="tag-posts-grid">
+        <th:block th:with="fallbackCover=${'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 675%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x2=%221%22 y2=%221%22%3E%3Cstop stop-color=%22%2342A5F5%22/%3E%3Cstop offset=%221%22 stop-color=%22%231E88E5%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%221200%22 height=%22675%22 fill=%22url(%23g)%22/%3E%3C/svg%3E'}">
+        <div class="tag-posts-grid" th:attr="data-tag=${tag.metadata.name}">
             <div th:each="post : ${posts.items}" class="post-card">
                 <a th:href="@{${post.status?.permalink}}" class="post-card__link" data-pjax>
-                    <div class="post-card__cover" th:if="${post.spec.cover}">
-                        <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" loading="lazy">
+                    <div class="post-card__cover">
+                        <img th:src="${fallbackCover}" th:alt="${post.spec.title}" loading="eager"
+                             th:attr="data-post-cover=${post.spec.cover},data-post-key=${post.metadata.name}">
                     </div>
-                    <div class="post-card__content" th:classappend="${post.spec.cover == null or post.spec.cover == ''} ? 'post-card__content--no-cover'">
+                    <div class="post-card__content">
                         <div class="post-card__tags" th:if="${not #lists.isEmpty(post.tags)}">
                             <span th:each="t : ${post.tags}" class="post-card__tag"
                                   th:text="${t.spec.displayName}">标签</span>
@@ -37,8 +49,27 @@
                 </a>
             </div>
         </div>
+        </th:block>
 
-        <div th:replace="~{modules/pagination :: pagination(${posts})}"></div>
+        <div class="load-more-hint tag-load-more" data-tag-load-more></div>
+        <div class="load-more-sentinel" data-tag-load-sentinel aria-hidden="true" style="display:block;height:1px;"></div>
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            var grid = document.querySelector('.tag-posts-grid[data-tag]'), sentinel = document.querySelector('[data-tag-load-sentinel]'), hint = document.querySelector('[data-tag-load-more]');
+            if (!grid || !sentinel || !hint) return;
+            var tag = grid.getAttribute('data-tag'), initial = grid.children.length, batch = 10, cursor = initial, all = null, loading = false, finished = false;
+            var photos = /*[[${photoFinder != null ? #lists.toList(photoFinder.listAll()) : null}]]*/ [];
+            var photoUrls = (photos || []).map(function (p) { return p && p.spec && p.spec.url ? p.spec.url : ''; }).filter(Boolean);
+            document.querySelectorAll('img[data-post-key]').forEach(function (img, index) { var cover = (img.getAttribute('data-post-cover') || '').trim(); if (cover) { img.src = cover; return; } if (photoUrls.length) { var seed = img.getAttribute('data-post-key') || String(index), initialHash = 0; for (var j = 0; j < seed.length; j++) initialHash = ((initialHash << 5) - initialHash + seed.charCodeAt(j)) | 0; img.src = photoUrls[Math.abs(initialHash) % photoUrls.length]; } });
+            function esc(value) { var d = document.createElement('div'); d.textContent = value || ''; return d.innerHTML; }
+            function coverFor(post) { if (post.spec && post.spec.cover) return post.spec.cover; if (!photoUrls.length) return ''; var seed = post.metadata && post.metadata.name || ''; var hash = 0; for (var i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0; return photoUrls[Math.abs(hash) % photoUrls.length]; }
+            function cardFor(post) { var spec = post.spec || {}, status = post.status || {}, stats = post.stats || {}, cover = coverFor(post), excerpt = status.excerpt ? String(status.excerpt).slice(0, 80) : ''; var el = document.createElement('div'); el.className = 'post-card'; el.innerHTML = '<a href="' + esc(status.permalink || '#') + '" class="post-card__link" data-pjax><div class="post-card__cover">' + (cover ? '<img src="' + esc(cover) + '" alt="' + esc(spec.title) + '" loading="lazy">' : '') + '</div><div class="post-card__content"><h3 class="post-card__title">' + esc(spec.title) + '</h3>' + (excerpt ? '<p class="post-card__excerpt">' + esc(excerpt) + '</p>' : '') + '<div class="post-card__footer"><div class="post-card__stats"><span class="post-card__stat">浏览 ' + (stats.visit || 0) + '</span></div><span class="post-card__time">' + esc(String(spec.publishTime || '').slice(0, 10)) + '</span></div></div></a>'; return el; }
+            function loadMore() { if (loading || finished) return; loading = true; hint.textContent = '加载中…'; hint.style.display = 'flex'; var request = all ? Promise.resolve(all) : fetch('/apis/api.content.halo.run/v1alpha1/posts?page=1&size=100&sort=spec.publishTime,desc', { credentials: 'same-origin' }).then(function (r) { if (!r.ok) throw new Error('request failed'); return r.json(); }).then(function (data) { all = (data.items || []).filter(function (post) { return post.spec && (post.spec.tags || []).indexOf(tag) !== -1; }); return all; }); request.then(function (items) { var next = items.slice(cursor, cursor + batch); next.forEach(function (post) { grid.appendChild(cardFor(post)); }); cursor += next.length; finished = cursor >= items.length; hint.textContent = finished ? '— 到底啦 —' : ''; hint.style.display = finished ? 'flex' : 'none'; loading = false; }).catch(function () { hint.textContent = '加载失败，向下滑动可重试'; hint.style.display = 'flex'; loading = false; }); }
+            new IntersectionObserver(function (entries) { if (entries[0].isIntersecting) loadMore(); }, { rootMargin: '360px 0px' }).observe(sentinel);
+        })();
+        /*]]>*/
+        </script>
     </div>
 </th:block>
 

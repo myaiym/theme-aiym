@@ -4,9 +4,27 @@
       lang="zh-CN">
 
 <th:block th:fragment="content">
+    <style>
+    .archives-page { max-width: 1000px; margin: 0 auto; padding: 24px 0 56px; }
+    .archives-header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .archives-title { margin: 0; color: var(--color-text-primary); font-size: 26px; line-height: 1.25; letter-spacing: -.03em; }
+    .archives-subtitle { max-width: 420px; margin: 0; color: var(--color-text-muted); font-size: 13px; line-height: 1.6; text-align: right; }
+    .archives-list { position: relative; padding-left: 144px; }
+    .archives-list::before { content: ''; position: absolute; top: 10px; bottom: 10px; left: 107px; width: 1px; background: var(--color-border-primary); }
+    .archives-item { position: relative; display: grid; grid-template-columns: 92px minmax(0, 1fr); align-items: center; gap: 16px; min-height: 58px; }
+    .archives-item::before { content: ''; position: absolute; left: -41px; top: 50%; width: 9px; height: 9px; border: 2px solid var(--color-bg-primary); border-radius: 50%; background: var(--color-brand); transform: translateY(-50%); box-shadow: 0 0 0 1px rgba(var(--color-brand-rgb), .28); }
+    .archives-item__date { color: var(--color-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+    .archives-item__title { margin: 0; min-width: 0; font-size: 15px; font-weight: 600; line-height: 1.45; }
+    .archives-item__title a { display: block; padding: 12px 15px; border: 1px solid transparent; border-radius: 12px; color: var(--color-text-primary); background: var(--color-bg-secondary); box-shadow: 0 1px 5px rgba(31,38,46,.025); text-decoration: none; transition: border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease; }
+    @media (hover: hover) { .archives-item__title a:hover { color: var(--color-brand-text); border-color: rgba(var(--color-brand-rgb), .34); box-shadow: 0 7px 20px rgba(31,38,46,.06); transform: translateX(3px); } }
+    .archives-item__title a:focus-visible { outline: 3px solid var(--color-brand-glow); outline-offset: 2px; }
+    @media (max-width: 767px) { .archives-page { padding: 16px 0 28px; } .archives-header { align-items: flex-start; flex-direction: column; gap: 6px; margin-bottom: 16px; } .archives-title { font-size: 22px; } .archives-subtitle { text-align: left; font-size: 12px; } .archives-list { padding-left: 16px; } .archives-list::before { left: 4px; } .archives-item { grid-template-columns: 76px minmax(0, 1fr); gap: 9px; min-height: 54px; } .archives-item::before { left: -16px; width: 7px; height: 7px; } .archives-item__date { font-size: 10px; } .archives-item__title { font-size: 13px; } .archives-item__title a { padding: 10px 11px; border-radius: 10px; } }
+    </style>
+
     <div class="archives-page">
         <header class="archives-header">
             <h1 class="archives-title">文章归档</h1>
+            <p class="archives-subtitle">按发布时间浏览全部文章，持续沉淀可复用的技术经验。</p>
         </header>
 
         <th:block th:with="archivesPosts = ${postFinder.list({page: 1, size: 200, sort: {'spec.publishTime,desc'}})}">
@@ -17,9 +35,9 @@
                           th:text="${#temporals.format(post.spec.publishTime, 'yyyy-MM-dd')}">
                         2024-01-01
                     </time>
-                    <h3 class="archives-item__title">
+                    <h2 class="archives-item__title">
                         <a th:href="@{${post.status?.permalink}}" th:text="${post.spec.title}">文章标题</a>
-                    </h3>
+                    </h2>
                 </div>
             </div>
         </th:block>

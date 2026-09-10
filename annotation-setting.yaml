@@ -7,19 +7,55 @@ spec:
     group: content.halo.run
     kind: Post
   formSchema:
+    # 资源中心文章专用：仅当文章归入“资源分类”且需要展示下载信息时填写。
+    # 普通博客文章无需填写下列字段。
     - $formkit: text
-      name: theme.aiym.fun/download-url
+      name: downloadUrl
       label: 下载地址
-      help: 资源的下载链接（规范化键）
+      help: "资源中心详情页的“立即下载”和复制链接会使用此地址。填写有效的 https:// 链接；没有下载地址可留空。"
     - $formkit: text
-      name: theme.aiym.fun/icon-url
+      name: iconUrl
       label: 图标地址
-      help: 资源图标图片 URL（规范化键）
+      help: "资源卡片与详情页展示的应用/资源图标 URL。建议使用正方形图片；留空则自动显示标题首字母。"
     - $formkit: text
-      name: theme.aiym.fun/version
+      name: version
       label: 版本号
-      help: 如 1.0.0（规范化键）
+      help: "展示在资源详情信息中，例如 16.3.5、最新版、v2.0。不是必填，资源没有明确版本时留空即可。"
     - $formkit: text
-      name: theme.aiym.fun/platform
+      name: platform
       label: 支持平台
-      help: 逗号分隔，如 Windows, macOS, Linux（规范化键）
+      help: "展示在资源详情信息中，例如 Windows、macOS、Linux、全平台；多个平台用中文或英文逗号分隔。"
+
+---
+
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  name: theme-aiym-tool-page
+spec:
+  targetRef:
+    group: content.halo.run
+    kind: SinglePage
+  formSchema:
+    # 工具箱专用：仅路径为 tools/xxx 且页面模板选“工具详情页（公共模板）”时填写。
+    # 其他普通单篇页面会看到这些字段，但应保持留空，工具箱不会收录它们。
+    - $formkit: text
+      name: tools.icon
+      label: 工具图标（Iconify）
+      help: "工具箱卡片的图标 ID，例如 mdi:code-json、tabler:hash。可在 icon-sets.iconify.design 查询；留空时显示默认拼图图标。"
+    - $formkit: text
+      name: tools.cat
+      label: 工具分类
+      help: "用于工具箱筛选，例如 开发、转换、生成、文本、实用；相同文字会自动归为同一分类。建议复用已有分类名称。"
+    - $formkit: text
+      name: tools.color
+      label: 图标颜色
+      help: "工具箱卡片图标的前景色，填写 CSS 色值，例如 #42A5F5。留空时自动使用主题品牌蓝。"
+    - $formkit: text
+      name: tools.bg
+      label: 图标背景色
+      help: "工具箱卡片图标的浅色背景，填写 CSS 色值，例如 #EAF5FE。建议使用与图标颜色匹配的浅色。"
+    - $formkit: text
+      name: tools.sort
+      label: 工具排序
+      help: "控制工具箱内的排序：数字越小越靠前，例如 0、10、20。留空时排在已设置排序的工具之后。"

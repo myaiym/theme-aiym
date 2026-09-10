@@ -13,17 +13,24 @@
             <nav class="mobile-menu-list">
                 <th:block th:with="menu = ${menuFinder.getPrimary()}">
                     <th:block th:if="${menu != null and not #lists.isEmpty(menu.menuItems)}">
-                        <a th:each="item : ${menu.menuItems}"
-                           th:href="@{${item.status.href}}"
-                           th:target="${item.spec.target?.value}"
-                           th:classappend="${#annotations.contains(item, 'animation') ? 'animated-hover' : ''}"
-                           class="mobile-menu-link">
-                            <span th:if="${#annotations.contains(item, 'icon') and #annotations.get(item, 'icon') != ''}"
-                                  class="iconify"
-                                  th:attr="data-icon=${#annotations.get(item, 'icon')}"
-                                  style="width:18px;height:18px;vertical-align:-0.15em;"></span>
-                            <span th:text="${item.status.displayName}">菜单</span>
-                        </a>
+                        <div class="mobile-menu-entry" data-mobile-menu-entry th:each="item : ${menu.menuItems}">
+                            <a th:href="@{${item.status.href}}"
+                               th:target="${item.spec.target?.value}"
+                               th:classappend="${#annotations.contains(item, 'animation') ? 'animated-hover' : ''}"
+                               class="mobile-menu-link">
+                                <span th:if="${#annotations.contains(item, 'icon') and #annotations.get(item, 'icon') != ''}"
+                                      class="iconify"
+                                      th:attr="data-icon=${#annotations.get(item, 'icon')}"
+                                      style="width:18px;height:18px;vertical-align:-0.15em;"></span>
+                                <span th:text="${item.status.displayName}">菜单</span>
+                            </a>
+                            <div th:if="${item.children != null and not #lists.isEmpty(item.children)}" class="mobile-menu-children">
+                                <a th:each="child : ${item.children}" th:href="@{${child.status.href}}" th:target="${child.spec.target?.value}" class="mobile-menu-child-link">
+                                    <span th:if="${#annotations.contains(child, 'icon') and #annotations.get(child, 'icon') != ''}" class="iconify" th:attr="data-icon=${#annotations.get(child, 'icon')}" style="width:16px;height:16px;vertical-align:-0.15em;"></span>
+                                    <span th:text="${child.status.displayName}">子菜单</span>
+                                </a>
+                            </div>
+                        </div>
                     </th:block>
                     <th:block th:if="${menu == null or #lists.isEmpty(menu.menuItems)}">
                         <a href="/" class="mobile-menu-link">首页</a>

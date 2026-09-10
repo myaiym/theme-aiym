@@ -4,19 +4,31 @@
       lang="zh-CN">
 
 <th:block th:fragment="content">
+    <style>
+    .category-page { max-width: 1200px; margin: 0 auto; padding: 24px 0 56px; }
+    .category-header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .category-title { margin: 0; color: var(--color-text-primary); font-size: 26px; line-height: 1.25; letter-spacing: -.03em; }
+    .category-description { max-width: 420px; margin: 0; color: var(--color-text-muted); font-size: 13px; line-height: 1.6; text-align: right; }
+    .category-load-more { min-height: 28px; justify-content: center; padding-top: 12px; color: var(--color-text-muted); font-size: 12px; }
+    .category-page [data-category-load-sentinel] { display: block !important; height: 1px !important; }
+    @media (max-width: 767px) { .category-page { padding: 16px 0 28px; } .category-header { align-items: flex-start; flex-direction: column; gap: 4px; margin-bottom: 14px; } .category-title { font-size: 21px; } .category-description { text-align: left; font-size: 12px; } }
+    </style>
     <div class="category-page">
         <header class="category-header">
             <h1 class="category-title" th:text="${category.spec.displayName}">分类</h1>
-            <p class="category-description" th:if="${category.spec.description}" th:text="${category.spec.description}"></p>
+            <p class="category-description" th:if="${category.spec.description != null and category.spec.description != ''}" th:text="${category.spec.description}"></p>
+            <p class="category-description" th:if="${category.spec.description == null or category.spec.description == ''}">浏览此分类下的技术文章与实操记录。</p>
         </header>
 
-        <div class="category-posts-grid">
+        <th:block th:with="fallbackCover=${'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1200 675%22%3E%3Cdefs%3E%3ClinearGradient id=%22g%22 x2=%221%22 y2=%221%22%3E%3Cstop stop-color=%22%2342A5F5%22/%3E%3Cstop offset=%221%22 stop-color=%22%231E88E5%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%221200%22 height=%22675%22 fill=%22url(%23g)%22/%3E%3C/svg%3E'}">
+        <div class="category-posts-grid" th:attr="data-category=${category.metadata.name}">
             <div th:each="post : ${posts.items}" class="post-card">
                 <a th:href="@{${post.status?.permalink}}" class="post-card__link" data-pjax>
-                    <div class="post-card__cover" th:if="${post.spec.cover}">
-                        <img th:src="${post.spec.cover}" th:alt="${post.spec.title}" loading="lazy">
+                    <div class="post-card__cover">
+                        <img th:src="${fallbackCover}" th:alt="${post.spec.title}" loading="eager"
+                             th:attr="data-post-cover=${post.spec.cover},data-post-key=${post.metadata.name}">
                     </div>
-                    <div class="post-card__content" th:classappend="${post.spec.cover == null or post.spec.cover == ''} ? 'post-card__content--no-cover'">
+                    <div class="post-card__content">
                         <div class="post-card__tags" th:if="${not #lists.isEmpty(post.tags)}">
                             <span th:each="tag : ${post.tags}" class="post-card__tag"
                                   th:text="${tag.spec.displayName}">标签</span>
@@ -42,8 +54,54 @@
                 </a>
             </div>
         </div>
+        </th:block>
 
-        <div th:replace="~{modules/pagination :: pagination(${posts})}"></div>
+        <div class="load-more-hint category-load-more" data-category-load-more></div>
+        <div class="load-more-sentinel" data-category-load-sentinel aria-hidden="true" style="display:block;height:1px;"></div>
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function () {
+            var grid = document.querySelector('.category-posts-grid[data-category]');
+            var sentinel = document.querySelector('[data-category-load-sentinel]');
+            var hint = document.querySelector('[data-category-load-more]');
+            if (!grid || !sentinel || !hint) return;
+            var category = grid.getAttribute('data-category');
+            var page = Number(new URLSearchParams(location.search).get('page')) || 1;
+            var size = 10, loading = false, finished = grid.children.length < size;
+            var photos = /*[[${photoFinder != null ? #lists.toList(photoFinder.listAll()) : null}]]*/ [];
+            var photoUrls = (photos || []).map(function (p) { return p && p.spec && p.spec.url ? p.spec.url : ''; }).filter(Boolean);
+            document.querySelectorAll('img[data-post-key]').forEach(function (img, index) { var cover = (img.getAttribute('data-post-cover') || '').trim(); if (cover) { img.src = cover; return; } if (photoUrls.length) { var seed = img.getAttribute('data-post-key') || String(index), initialHash = 0; for (var j = 0; j < seed.length; j++) initialHash = ((initialHash << 5) - initialHash + seed.charCodeAt(j)) | 0; img.src = photoUrls[Math.abs(initialHash) % photoUrls.length]; } });
+            function esc(value) { var d = document.createElement('div'); d.textContent = value || ''; return d.innerHTML; }
+            function coverFor(post) {
+                if (post.spec && post.spec.cover) return post.spec.cover;
+                if (!photoUrls.length) return '';
+                var seed = post.metadata && post.metadata.name || '';
+                var hash = 0; for (var i = 0; i < seed.length; i++) hash = ((hash << 5) - hash + seed.charCodeAt(i)) | 0;
+                return photoUrls[Math.abs(hash) % photoUrls.length];
+            }
+            function tagsFor(post) {
+                return (post.tags || []).slice(0, 3).map(function (tag) { return tag.spec && tag.spec.displayName ? '<span class="post-card__tag">' + esc(tag.spec.displayName) + '</span>' : ''; }).join('');
+            }
+            function cardFor(post) {
+                var spec = post.spec || {}, status = post.status || {}, stats = post.stats || {};
+                var cover = coverFor(post), tags = tagsFor(post), excerpt = status.excerpt ? String(status.excerpt).slice(0, 80) : '';
+                var el = document.createElement('div'); el.className = 'post-card';
+                el.innerHTML = '<a href="' + esc(status.permalink || '#') + '" class="post-card__link" data-pjax><div class="post-card__cover">' + (cover ? '<img src="' + esc(cover) + '" alt="' + esc(spec.title) + '" loading="lazy">' : '') + '</div><div class="post-card__content">' + (tags ? '<div class="post-card__tags">' + tags + '</div>' : '') + '<h3 class="post-card__title">' + esc(spec.title) + '</h3>' + (excerpt ? '<p class="post-card__excerpt">' + esc(excerpt) + '</p>' : '') + '<div class="post-card__footer"><div class="post-card__stats"><span class="post-card__stat">浏览 ' + (stats.visit || 0) + '</span><span class="post-card__stat">评论 ' + (stats.comment || 0) + '</span></div><span class="post-card__time">' + esc(String(spec.publishTime || '').slice(0, 10)) + '</span></div></div></a>';
+                return el;
+            }
+            function loadMore() {
+                if (loading || finished) return;
+                loading = true; hint.textContent = '加载中…'; hint.style.display = 'flex';
+                fetch('/apis/api.content.halo.run/v1alpha1/posts?page=' + (page + 1) + '&size=' + size + '&sort=spec.publishTime,desc&fieldSelector=spec.categories=' + encodeURIComponent(category), { credentials: 'same-origin' })
+                    .then(function (r) { if (!r.ok) throw new Error('request failed'); return r.json(); })
+                    .then(function (data) { var items = data.items || []; items.forEach(function (post) { grid.appendChild(cardFor(post)); }); page++; finished = !data.hasNext || items.length === 0; hint.textContent = finished ? '— 到底啦 —' : ''; hint.style.display = finished ? 'flex' : 'none'; loading = false; })
+                    .catch(function () { hint.textContent = '加载失败，向下滑动可重试'; hint.style.display = 'flex'; loading = false; });
+            }
+            if (finished) { hint.textContent = '— 到底啦 —'; hint.style.display = 'flex'; return; }
+            new IntersectionObserver(function (entries) { if (entries[0].isIntersecting) loadMore(); }, { rootMargin: '360px 0px' }).observe(sentinel);
+        })();
+        /*]]>*/
+        </script>
     </div>
 </th:block>
 

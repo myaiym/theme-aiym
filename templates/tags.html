@@ -4,19 +4,74 @@
       lang="zh-CN">
 
 <th:block th:fragment="content">
+    <style>
+    .tags-page { max-width: 1040px; margin: 0 auto; padding: 28px 0 60px; }
+    .tags-hero { position: relative; min-height: 124px; padding: 27px 30px; overflow: hidden; border: 1px solid rgba(var(--color-brand-rgb), .20); border-radius: 18px; background: linear-gradient(120deg, var(--color-bg-secondary), rgba(var(--color-brand-rgb), .10) 72%, rgba(var(--color-brand-rgb), .18)); box-shadow: 0 10px 28px rgba(31,38,46,.045); }
+    .tags-hero::after { content: '#'; position: absolute; right: 30px; bottom: -35px; color: rgba(var(--color-brand-rgb), .13); font-size: 174px; font-weight: 800; line-height: 1; letter-spacing: -.1em; pointer-events: none; }
+    .tags-hero__copy { position: relative; z-index: 1; }
+    .tags-hero__kicker { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: var(--color-brand-text); font-size: 12px; font-weight: 700; letter-spacing: .05em; }
+    .tags-hero__kicker::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--color-brand); box-shadow: 0 0 0 5px rgba(var(--color-brand-rgb), .12); }
+    .tags-title { margin: 0; color: var(--color-text-primary); font-size: 30px; font-weight: 750; letter-spacing: -.05em; line-height: 1.15; }
+    .tags-subtitle { margin: 9px 0 0; color: var(--color-text-secondary); font-size: 13px; line-height: 1.65; }
+    .tags-card { margin-top: 18px; padding: 22px; border: 1px solid var(--color-border-primary); border-radius: 16px; background: var(--color-bg-secondary); box-shadow: 0 3px 14px rgba(31,38,46,.035); }
+    .tags-card__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .tags-card__title { margin: 0; color: var(--color-text-primary); font-size: 15px; font-weight: 700; }
+    .tags-card__count { margin: 0; color: var(--color-text-muted); font-size: 12px; }
+    .tags-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tag-chip { --tag-hue: 204; display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 7px 12px 7px 14px; border: 1px solid hsl(var(--tag-hue) 72% 46% / .26); border-radius: 999px; color: hsl(var(--tag-hue) 48% 26%); background: hsl(var(--tag-hue) 88% 96%); font-size: 13px; font-weight: 600; line-height: 1; text-decoration: none; box-shadow: inset 0 1px rgba(255,255,255,.72); transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
+    .tag-chip__dot { width: 7px; height: 7px; border-radius: 50%; background: hsl(var(--tag-hue) 72% 48%); box-shadow: 0 0 0 4px hsl(var(--tag-hue) 72% 48% / .13); }
+    .tag-chip__name { max-width: 164px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tag-chip__count { display: inline-grid; min-width: 18px; height: 18px; place-items: center; padding: 0 4px; border-radius: 99px; color: hsl(var(--tag-hue) 55% 28%); background: hsl(var(--tag-hue) 62% 68% / .20); font-size: 10px; font-variant-numeric: tabular-nums; }
+    @media (hover: hover) { .tag-chip:hover { transform: translateY(-2px); background: hsl(var(--tag-hue) 80% 92%); box-shadow: 0 8px 18px hsl(var(--tag-hue) 60% 38% / .16), inset 0 1px rgba(255,255,255,.8); } }
+    .tag-chip:focus-visible { outline: 3px solid var(--color-brand-glow); outline-offset: 2px; }
+    [data-theme="dark"] .tags-hero { background: linear-gradient(120deg, var(--color-bg-secondary), rgba(var(--color-brand-rgb), .13) 70%, rgba(var(--color-brand-rgb), .20)); }
+    [data-theme="dark"] .tag-chip { color: hsl(var(--tag-hue) 88% 82%); background: hsl(var(--tag-hue) 35% 17%); border-color: hsl(var(--tag-hue) 62% 56% / .36); box-shadow: inset 0 1px rgba(255,255,255,.06); }
+    [data-theme="dark"] .tag-chip__count { color: hsl(var(--tag-hue) 90% 87%); background: hsl(var(--tag-hue) 65% 64% / .20); }
+    @media (max-width: 767px) { .tags-page { padding: 16px 0 28px; } .tags-hero { min-height: 112px; padding: 21px 18px; border-radius: 15px; } .tags-hero::after { right: 15px; bottom: -20px; font-size: 126px; } .tags-title { font-size: 25px; } .tags-subtitle { max-width: 250px; font-size: 12px; } .tags-card { margin-top: 12px; padding: 14px; border-radius: 13px; } .tags-card__head { margin-bottom: 12px; } .tags-cloud { gap: 8px; } .tag-chip { min-height: 35px; gap: 7px; padding: 6px 10px 6px 12px; font-size: 12px; } .tag-chip__name { max-width: 120px; } }
+    </style>
+
     <div class="tags-page">
-        <header class="tags-header">
-            <h1 class="tags-title">文章标签</h1>
+        <header class="tags-hero">
+            <div class="tags-hero__copy">
+                <p class="tags-hero__kicker">内容索引</p>
+                <h1 class="tags-title">标签</h1>
+                <p class="tags-subtitle">用关键词串联内容，点击任意标签查看相关文章。</p>
+            </div>
         </header>
 
-        <div class="tags-cloud">
-            <a th:each="tag : ${tags}"
-               th:href="@{${tag.status?.permalink}}"
-               class="tag-cloud-item"
-               th:text="'#' + ${tag.spec.displayName}">
-            </a>
-        </div>
+        <section class="tags-card" aria-labelledby="tags-cloud-title">
+            <div class="tags-card__head">
+                <h2 class="tags-card__title" id="tags-cloud-title">全部标签</h2>
+                <p class="tags-card__count" th:text="${#lists.size(tags)} + ' 个关键词'">0 个关键词</p>
+            </div>
+            <div class="tags-cloud">
+                <a th:each="tag : ${tags}"
+                   th:href="@{${tag.status?.permalink}}"
+                   class="tag-chip"
+                   th:attr="data-tag-name=${tag.spec.displayName}">
+                    <span class="tag-chip__dot" aria-hidden="true"></span>
+                    <span class="tag-chip__name" th:text="${tag.spec.displayName}">标签</span>
+                    <span class="tag-chip__count" th:text="${tag.postCount}">0</span>
+                </a>
+            </div>
+        </section>
     </div>
+
+    <script>
+    (function () {
+        var palette = [198, 222, 252, 278, 310, 334, 356, 18, 154, 174];
+        var used = {};
+        document.querySelectorAll('.tag-chip[data-tag-name]').forEach(function (chip, index) {
+            var value = chip.getAttribute('data-tag-name') || String(index), hash = 0;
+            for (var i = 0; i < value.length; i++) hash = ((hash << 5) - hash + value.charCodeAt(i)) | 0;
+            /* 标签名决定起始颜色；如撞色则向后取下一个，优先让同屏标签各不相同。 */
+            var colorIndex = Math.abs(hash) % palette.length;
+            while (used[colorIndex] && Object.keys(used).length < palette.length) colorIndex = (colorIndex + 1) % palette.length;
+            used[colorIndex] = true;
+            chip.style.setProperty('--tag-hue', palette[colorIndex]);
+        });
+    })();
+    </script>
 </th:block>
 
 </html>

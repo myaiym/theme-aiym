@@ -109,14 +109,10 @@ spec:
     - group: toolbox
       label: "工具箱"
       formSchema:
-        - $formkit: text
-          name: _hint
-          label: ""
-          help: "📌 内置工具：路径以 /tools/ 开头的自定义页面会自动展示在工具箱中，无需手动配置。每个工具的名称取自页面标题，简介取自页面摘要，图标/分类/颜色在页面 Annotations 中设置（tools.icon、tools.cat、tools.color、tools.bg、tools.sort）。🔗 外部工具：下方可添加 https 外链工具，会在新窗口打开。"
-          value: ""
         - $formkit: repeater
           name: toolboxItems
           label: "外部工具（https 链接）"
+          help: "内置工具无需在此添加：新建单篇页面，路径使用 tools/xxx 并选择“工具详情页（公共模板）”；标题、摘要及页面的“注解”会自动生成工具卡。这里只添加外部 https 工具。"
           children:
             - $formkit: text
               name: name
@@ -199,6 +195,49 @@ spec:
           placeholder: "NAS&#10;Docker&#10;fnOS&#10;Linux"
 
 
+
+
+    - group: notice
+      label: "公告栏"
+      formSchema:
+        - $formkit: switch
+          name: enabled
+          label: "启用公告栏"
+          help: "在全站内容区顶部显示一条轻量公告。"
+          value: true
+        - $formkit: text
+          name: text
+          label: "公告内容"
+          help: "建议控制在 36 个字以内，手机端超长内容会自动省略。"
+          placeholder: "例如：工具箱新增网络测速与图片压缩工具"
+          value: "本站持续整理实用工具与技术内容，欢迎收藏并关注更新。"
+        - $formkit: textarea
+          name: detail
+          label: "公告详情（可选）"
+          help: "未填写公告链接时，点击公告滚动区域会弹出这里的完整内容；留空则展示公告内容本身。支持换行。"
+          rows: 5
+          placeholder: "例如：新增内容、使用说明或活动规则"
+        - $formkit: text
+          name: link
+          label: "公告链接"
+          help: "可留空；填写后显示链接按钮，并优先跳转。留空时点击滚动公告可查看详情。支持站内路径（如 /tools/）或 https:// 链接。"
+          placeholder: "/tools/"
+          value: "/about-me"
+        - $formkit: text
+          name: linkText
+          label: "链接文字"
+          help: "填写公告链接后显示，默认“查看详情”。"
+          value: "了解本站"
+        - $formkit: switch
+          name: closable
+          label: "允许访客关闭"
+          help: "关闭状态按公告版本号保存在访客本机；修改版本号后会再次展示。"
+          value: true
+        - $formkit: text
+          name: version
+          label: "公告版本号"
+          help: "每次更新公告内容时修改此值，例如 2026-09-06-1。"
+          value: "2026-09-default"
 
 
     - group: about

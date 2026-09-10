@@ -124,22 +124,32 @@
         .post-toc-sidebar .post-toc-link--active { color: var(--color-brand); border-left-color: var(--color-brand); font-weight: 600; }
     }
 
-    /* === 移动端 TOC 浮动按钮 === */
+    /* === 移动 / 平板 TOC 浮动按钮 === */
     .post-toc-fab {
         display: none; /* 桌面端隐藏 */
     }
     @media (max-width: 1023px) {
+        /* 目录与返回顶部共用同一列、同一触控尺寸；仅上下堆叠，避免因全局按钮规则产生横向偏移。 */
+        .post-toc-fab,
+        .back-to-top {
+            right: 16px !important;
+            width: 44px !important;
+            height: 44px !important;
+            box-sizing: border-box;
+        }
         .post-toc-fab {
             display: flex;
-            position: fixed; bottom: 88px; right: 16px; z-index: 200;
-            width: 44px; height: 44px; border-radius: 12px;
+            position: fixed; bottom: 88px; z-index: 200;
+            border-radius: 14px;
             background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary);
             box-shadow: 0 4px 16px rgba(0,0,0,0.1);
             align-items: center; justify-content: center;
             cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s;
         }
+        /* 与目录保持 12px 间距，中心轴完全重合。 */
+        .back-to-top { bottom: 144px !important; }
+        .post-toc-fab svg, .back-to-top svg { display: block; stroke-linecap: round; stroke-linejoin: round; }
         @media (hover: hover) and (pointer: fine) { .post-toc-fab:hover { background: var(--color-brand); color: #fff; border-color: var(--color-brand); } }
-        .back-to-top { bottom: 142px !important; right: 12px !important; }
     }
 
     /* === 移动端 TOC 滑出面板 === */

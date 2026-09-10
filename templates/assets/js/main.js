@@ -562,6 +562,73 @@ class PostPageManager {
   }
 }
 
+function initSiteNotice() {
+  var notice = document.querySelector("[data-site-notice]");
+  if (!notice || notice.dataset.noticeReady === "true") return;
+  notice.dataset.noticeReady = "true";
+  var version = notice.getAttribute("data-notice-version") || "1";
+  var key = "aiym-site-notice-closed:" + version;
+  var text = notice.querySelector("[data-site-notice-text], [data-site-notice-detail-trigger]");
+  var track = notice.querySelector("[data-site-notice-track]");
+  var rail = notice.querySelector(".site-notice__text-rail");
+  function refreshMarquee() {
+    if (!text || !track || !rail) return;
+    rail.classList.remove("is-marquee");
+    rail.style.removeProperty("animation");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    /* 以当前容器实际宽度判断：桌面端一行放得下时静止，只有被截断时才滚动。 */
+    var overflows = Math.ceil(track.scrollWidth) > Math.ceil(text.clientWidth) + 2;
+    if (!overflows) return;
+    /* 前 3 秒固定展示开头；其余滚动时间按实际字数计算（约 3 个汉字/秒，至少 8 秒）。 */
+    var charCount = (track.textContent || "").replace(/\s+/g, "").length;
+    var holdSeconds = 3;
+    var scrollSeconds = Math.max(8, charCount / 3);
+    var totalSeconds = holdSeconds + scrollSeconds;
+    var holdPercent = (holdSeconds / totalSeconds * 100).toFixed(3);
+    var animationName = "site-notice-rail-" + charCount + "-" + Math.round(totalSeconds * 100);
+    var styleId = "site-notice-marquee-timing";
+    var style = document.getElementById(styleId);
+    if (!style) {
+      style = document.createElement("style");
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+    style.textContent = "@keyframes " + animationName + "{0%," + holdPercent + "%{transform:translateX(0)}100%{transform:translateX(-50%)}}";
+    rail.classList.add("is-marquee");
+    rail.style.animation = animationName + " " + totalSeconds.toFixed(2) + "s linear infinite";
+  }
+  try {
+    if (window.localStorage.getItem(key) === "1") {
+      notice.hidden = true;
+      return;
+    }
+  } catch (e) {}
+  requestAnimationFrame(refreshMarquee);
+  window.addEventListener("resize", refreshMarquee, { passive: true });
+  var close = notice.querySelector("[data-site-notice-close]");
+  if (close) {
+    close.addEventListener("click", function () {
+      notice.hidden = true;
+      try { window.localStorage.setItem(key, "1"); } catch (e) {}
+    });
+  }
+  var detailTrigger = notice.querySelector("[data-site-notice-detail-trigger]");
+  var dialog = document.querySelector("[data-site-notice-dialog]");
+  var dialogBody = dialog && dialog.querySelector("[data-site-notice-dialog-body]");
+  var dialogClose = dialog && dialog.querySelector("[data-site-notice-dialog-close]");
+  if (detailTrigger && dialog && dialogBody) {
+    detailTrigger.addEventListener("click", function () {
+      dialogBody.textContent = detailTrigger.getAttribute("data-notice-detail") || "";
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "open");
+    });
+    if (dialogClose) dialogClose.addEventListener("click", function () { dialog.close(); });
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+}
+
 /* --- Cover Gallery (random cover replacement) --- */
 class CoverGallery {
   constructor() { this.config = { gallery: [], defaultCover: "" }; }
@@ -632,7 +699,7 @@ function initAdaptiveNavigation() {
   var primary = nav.querySelector(".tabbar-primary");
   var more = nav.querySelector("[data-tabbar-more]");
   var overflow = nav.querySelector("[data-tabbar-overflow]");
-  var items = Array.prototype.slice.call(primary.querySelectorAll(".tabbar-item"));
+  var items = Array.prototype.slice.call(primary.querySelectorAll(".tabbar-menu-group"));
   var timer;
 
   function closeDesktopOverflow() {
@@ -643,10 +710,14 @@ function initAdaptiveNavigation() {
     overflow.innerHTML = "";
     items.filter(function(item) { return item.classList.contains("is-overflowed"); }).forEach(function(item) {
       var clone = item.cloneNode(true);
-      clone.className = "tabbar-overflow-item" + (item.classList.contains("active") ? " active" : "");
-      clone.removeAttribute("data-nav-link");
-      clone.removeAttribute("data-href");
-      clone.setAttribute("role", "menuitem");
+      clone.className = "tabbar-overflow-group";
+      var trigger = clone.querySelector(".tabbar-item");
+      if (trigger) {
+        trigger.className = "tabbar-overflow-item" + (trigger.classList.contains("active") ? " active" : "");
+        trigger.removeAttribute("data-nav-link");
+        trigger.removeAttribute("data-href");
+        trigger.setAttribute("role", "menuitem");
+      }
       overflow.appendChild(clone);
     });
   }
@@ -684,6 +755,7 @@ function initMobileOverflowNav() {
   if (!mobileNav || !menu || mobileNav.dataset.overflowReady === "true") return;
   mobileNav.dataset.overflowReady = "true";
   var items = Array.prototype.slice.call(mobileNav.querySelectorAll("[data-mobile-nav-link]"));
+  var entries = Array.prototype.slice.call(menu.querySelectorAll("[data-mobile-menu-entry]"));
   var more = mobileNav.querySelector("[data-mobile-menu-open]");
   var closeButtons = menu.querySelectorAll("[data-mobile-menu-close]");
   function setOpen(open) {
@@ -692,9 +764,10 @@ function initMobileOverflowNav() {
     more.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("mobile-menu-open", open);
   }
-  /* 菜单超过四项时保留前四项，第五格稳定为“更多”；不超过四项则全部直显。 */
-  if (items.length > 4) {
+  /* 最多展示五格：刚好五项全部直显；超过五项时，前四项直显，第五格固定为“更多”，弹层仅展示第 5 项及其后的入口。 */
+  if (items.length > 5) {
     items.slice(4).forEach(function(item) { item.hidden = true; });
+    entries.slice(0, 4).forEach(function(entry) { entry.hidden = true; });
     more.hidden = false;
   }
   more.addEventListener("click", function() { setOpen(true); });
@@ -723,6 +796,8 @@ function aiymRefreshAfterPjax() {
     }
   });
   if (window.AIYMAdaptDesktopNav) window.AIYMAdaptDesktopNav();
+  /* 正常情况下公告在 main 外不会被 PJAX 替换；保留幂等初始化，兼容缓存页或旧 DOM。 */
+  initSiteNotice();
 }
 window.AIYMPjaxRefresh = aiymRefreshAfterPjax;
 
@@ -736,6 +811,7 @@ document.addEventListener("DOMContentLoaded", function () {
   sm.init();
 
   aiymRefreshAfterPjax();
+  initSiteNotice();
 
   // 自适应导航：桌面按实际宽度折叠；移动端菜单溢出到“更多”。
   initAdaptiveNavigation();
